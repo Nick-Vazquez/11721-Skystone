@@ -87,7 +87,6 @@ public class TeleOp_Basic extends LinearOpMode {
             rotation        = gamepad1.right_stick_x;
 
             // TODO: Normalize Values
-            // TODO: Change back signs if roger moves idiotically
             backLeftPower = forward - side + rotation;
             backRightPower = forward + side - rotation;
             frontRightPower = forward - side - rotation;

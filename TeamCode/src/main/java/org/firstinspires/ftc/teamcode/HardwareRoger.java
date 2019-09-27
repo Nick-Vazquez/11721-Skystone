@@ -35,11 +35,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 /**
  * This is NOT an opmode.
  *
- * This class can be used to define all the specific hardware for a single roger.
- * In this case that roger is a Pushbot.
- * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
+ * This class can be used to define all the specific hardware for a single robot.
+ * In this case that robot is Roger.
  *
- * This hardware class assumes the following device names have been configured on the roger:
+ * This hardware class assumes the following device names have been configured on roger:
  * Note:  All names are lower case and some have single spaces between words.
  *
  * Motor channel:  Front Left  drive motor:     "frontLeft"
@@ -47,28 +46,23 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
  * Motor channel:  Back  Right drive motor:     "backRight"
  * Motor channel:  Back  Left  drive motor:     "backLeft"
  */
-// TODO: Make public if it breaks
 class HardwareRoger
 {
     /* Public OpMode members. */
-    // TODO: Declare Public if it breaks
     DcMotor frontLeft   = null;
     DcMotor frontRight  = null;
     DcMotor backLeft    = null;
     DcMotor backRight   = null;
 
     /* local OpMode members. */
-    // TODO: Declare package-private if it breaks
     private HardwareMap hwMap           =  null;
 
     /* Constructor */
-    // TODO: Make public if it breaks
     HardwareRoger(){
 
     }
 
     /* Initialize standard Hardware interfaces */
-    // TODO: Make public if it breaks
     void init(HardwareMap ahwMap) {
         // Save reference to Hardware map
         hwMap = ahwMap;
