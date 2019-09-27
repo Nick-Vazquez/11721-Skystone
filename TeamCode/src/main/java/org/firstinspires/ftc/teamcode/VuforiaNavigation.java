@@ -140,11 +140,15 @@ public class VuforiaNavigation extends LinearOpMode {
          * documentation directory.
          */
         VuforiaTrackables skystone = this.vuforia.loadTrackablesFromAsset("Skystone");
+
         VuforiaTrackable RedPerimeterTgt1 = skystone.get(5);
-        RedPerimeterTgt1.setName("RedPerimeterTgt1");  // Stones
+        RedPerimeterTgt1.setName("RedPerimeterTgt1");
 
         VuforiaTrackable RedPerimeterTgt2 = skystone.get(6);
-        RedPerimeterTgt2.setName("RedPerimeterTgt2");  // Chips
+        RedPerimeterTgt2.setName("RedPerimeterTgt2");
+
+        VuforiaTrackable FrontPerimeterTgt1 = skystone.get(7);
+        FrontPerimeterTgt1.setName("FrontPerimeterTgt1");
 
         /** For convenience, gather together all the trackable objects in one easily-iterable collection */
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
@@ -217,23 +221,33 @@ public class VuforiaNavigation extends LinearOpMode {
          * - Then we rotate it  90 around the field's Z access to face it away from the audience.
          * - Finally, we translate it back along the X axis towards the red audience wall.
          */
-        OpenGLMatrix redTargetLocationOnField = OpenGLMatrix
+        OpenGLMatrix redTarget1LocationOnField = OpenGLMatrix
                 /* Then we translate the target off to the RED WALL. Our translation here
                 is a negative translation in X.*/
-                .translation(-mmFTCFieldWidth/2, 0, 0)
+                .translation(-mmFTCFieldWidth/2, mmFTCFieldWidth/4, 2*mmPerInch)
                 .multiplied(Orientation.getRotationMatrix(
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
                         AngleUnit.DEGREES, 90, 90, 0));
-        RedPerimeterTgt1.setLocation(redTargetLocationOnField);
-        RobotLog.ii(TAG, "Red Target=%s", format(redTargetLocationOnField));
+        RedPerimeterTgt1.setLocation(redTarget1LocationOnField);
+        RobotLog.ii(TAG, "Red Target 1 =%s", format(redTarget1LocationOnField));
 
-       /*
+        OpenGLMatrix redTarget2LocationOnField = OpenGLMatrix
+                // Remember these are done in reverse order
+                .translation(-mmFTCFieldWidth/2, -mmFTCFieldWidth/4, 2*mmPerInch)
+                .multiplied(Orientation.getRotationMatrix(
+                    /* First, in the fixed (field) coordinate system, we rotate 90deg in X, then 90 in Z */
+                    AxesReference.EXTRINSIC, AxesOrder.XZX,
+                    AngleUnit.DEGREES, 90, 90, 0));
+        RedPerimeterTgt2.setLocation(redTarget2LocationOnField);
+        RobotLog.ii(TAG, "Red Target 2 =%s", format(redTarget2LocationOnField));
+
+        /*
         * To place the Stones Target on the Blue Audience wall:
         * - First we rotate it 90 around the field's X axis to flip it upright
         * - Finally, we translate it along the Y axis towards the blue audience wall.
         */
-        OpenGLMatrix blueTargetLocationOnField = OpenGLMatrix
+        OpenGLMatrix FrontPerimeterTarget1LocationOnField = OpenGLMatrix
                 /* Then we translate the target off to the Blue Audience wall.
                 Our translation here is a positive translation in Y.*/
                 .translation(0, mmFTCFieldWidth/2, 0)
@@ -241,8 +255,8 @@ public class VuforiaNavigation extends LinearOpMode {
                         /* First, in the fixed (field) coordinate system, we rotate 90deg in X */
                         AxesReference.EXTRINSIC, AxesOrder.XZX,
                         AngleUnit.DEGREES, 90, 0, 0));
-        RedPerimeterTgt2.setLocation(blueTargetLocationOnField);
-        RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
+        FrontPerimeterTgt1.setLocation(FrontPerimeterTarget1LocationOnField);
+        RobotLog.ii(TAG, "Blue Target=%s", format(FrontPerimeterTarget1LocationOnField));
 
         /**
          * Create a transformation matrix describing where the phone is on the roger. Here, we
@@ -270,13 +284,15 @@ public class VuforiaNavigation extends LinearOpMode {
          */
         ((VuforiaTrackableDefaultListener) RedPerimeterTgt1.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
         ((VuforiaTrackableDefaultListener) RedPerimeterTgt2.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+        ((VuforiaTrackableDefaultListener) FrontPerimeterTgt1.getListener()).setPhoneInformation(phoneLocationOnRobot, parameters.cameraDirection);
+
 
         /**
          * A brief tutorial: here's how all the math is going to work:
          *
          * C = phoneLocationOnRobot  maps   phone coords -> roger coords
          * P = tracker.getPose()     maps   image target coords -> phone coords
-         * L = redTargetLocationOnField maps   image target coords -> field coords
+         * L = redTarget1LocationOnField maps   image target coords -> field coords
          *
          * So
          *
