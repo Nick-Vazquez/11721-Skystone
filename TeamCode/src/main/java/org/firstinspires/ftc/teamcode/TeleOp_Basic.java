@@ -32,12 +32,12 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 /**
- * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
+ * This OpMode uses the common Pushbot hardware class to define the devices on the roger.
  * All device access is managed through the HardwarePushbot class.
  * The code is structured as a LinearOpMode
  *
  * This particular OpMode executes a POV Game style Teleop for a PushBot
- * In this mode the left stick moves the robot FWD and back, the Right stick turns left and right.
+ * In this mode the left stick moves the roger FWD and back, the Right stick turns left and right.
  * It raises and lowers the claw using the Gampad Y and A buttons respectively.
  * It also opens and closes the claws slowly using the left and right Bumper buttons.
  *
@@ -70,7 +70,7 @@ public class TeleOp_Basic extends LinearOpMode {
          */
         roger.init(hardwareMap);
 
-        // Send telemetry message to signify robot waiting;
+        // Send telemetry message to signify roger waiting;
         telemetry.addData("Say", "Hello Driver"); // Roger is a friendly boi.
         telemetry.update();
 
@@ -87,7 +87,7 @@ public class TeleOp_Basic extends LinearOpMode {
             rotation        = gamepad1.right_stick_x;
 
             // TODO: Normalize Values
-            // TODO: Change back signs if robot moves idiotically
+            // TODO: Change back signs if roger moves idiotically
             backLeftPower = forward - side + rotation;
             backRightPower = forward + side - rotation;
             frontRightPower = forward - side - rotation;
@@ -111,7 +111,7 @@ public class TeleOp_Basic extends LinearOpMode {
             roger.backLeft.setPower(backLeftPower);
             roger.backRight.setPower(backRightPower);
 
-            // Send telemetry message to signify robot running;
+            // Send telemetry message to signify roger running;
             telemetry.addData("frontLeft",  "%.2f", frontLeftPower);
             telemetry.addData("frontRight", "%.2f", frontRightPower);
             telemetry.addData("backLeft", "%.2f", backLeftPower);

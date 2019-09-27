@@ -50,7 +50,7 @@ import java.util.List;
 
 /**
  * This 2016-2017 OpMode illustrates the basics of using the Vuforia localizer to determine
- * positioning and orientation of robot on the FTC field.
+ * positioning and orientation of roger on the FTC field.
  * The code is structured as a LinearOpMode
  *
  * Vuforia uses the phone's camera to inspect it's surroundings, and attempt to locate target images.
@@ -65,8 +65,8 @@ import java.util.List;
  * The two vision target are located on the two walls closest to the audience, facing in.
  * The Stones are on the RED side of the field, and the Chips are on the Blue side.
  *
- * A final calculation then uses the location of the camera on the robot to determine the
- * robot's location and orientation on the field.
+ * A final calculation then uses the location of the camera on the roger to determine the
+ * roger's location and orientation on the field.
  *
  * @see VuforiaLocalizer
  * @see VuforiaTrackableDefaultListener
@@ -120,7 +120,7 @@ public class VuforiaNavigation extends LinearOpMode {
         /*
          * We also indicate which camera on the RC that we wish to use.
          * Here we chose the back (HiRes) camera (for greater range), but
-         * for a competition robot, the front camera might be more convenient.
+         * for a competition roger, the front camera might be more convenient.
          */
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
@@ -156,12 +156,12 @@ public class VuforiaNavigation extends LinearOpMode {
          * target configuration files *must* correspond for the math to work out correctly.
          */
         float mmPerInch        = 25.4f;
-        float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your robot
+        float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your roger
         float mmFTCFieldWidth  = (12*12 - 2) * mmPerInch;   // the FTC field is ~11'10" center-to-center of the glass panels
 
         /**
          * In order for localization to work, we need to tell the system where each target we
-         * wish to use for navigation resides on the field, and we need to specify where on the robot
+         * wish to use for navigation resides on the field, and we need to specify where on the roger
          * the phone resides. These specifications are in the form of <em>transformation matrices.</em>
          * Transformation matrices are a central, important concept in the math here involved in localization.
          * See <a href="https://en.wikipedia.org/wiki/Transformation_matrix">Transformation Matrix</a>
@@ -208,7 +208,7 @@ public class VuforiaNavigation extends LinearOpMode {
          * In this configuration, the target's coordinate system aligns with that of the field.
          *
          * In a real situation we'd also account for the vertical (Z) offset of the target,
-         * but for simplicity, we ignore that here; for a real robot, you'll want to fix that.
+         * but for simplicity, we ignore that here; for a real roger, you'll want to fix that.
          *
          * To place the Stones Target on the Red Audience wall:
          * - First we rotate it 90 around the field's X axis to flip it upright
@@ -243,10 +243,10 @@ public class VuforiaNavigation extends LinearOpMode {
         RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
 
         /**
-         * Create a transformation matrix describing where the phone is on the robot. Here, we
-         * put the phone on the right hand side of the robot with the screen facing in (see our
+         * Create a transformation matrix describing where the phone is on the roger. Here, we
+         * put the phone on the right hand side of the roger with the screen facing in (see our
          * choice of BACK camera above) and in landscape mode. Starting from alignment between the
-         * robot's and phone's axes, this is a rotation of -90deg along the Y axis.
+         * roger's and phone's axes, this is a rotation of -90deg along the Y axis.
          *
          * When determining whether a rotation is positive or negative, consider yourself as looking
          * down the (positive) axis of rotation from the positive towards the origin. Positive rotations
@@ -272,18 +272,18 @@ public class VuforiaNavigation extends LinearOpMode {
         /**
          * A brief tutorial: here's how all the math is going to work:
          *
-         * C = phoneLocationOnRobot  maps   phone coords -> robot coords
+         * C = phoneLocationOnRobot  maps   phone coords -> roger coords
          * P = tracker.getPose()     maps   image target coords -> phone coords
          * L = redTargetLocationOnField maps   image target coords -> field coords
          *
          * So
          *
-         * C.inverted()              maps   robot coords -> phone coords
+         * C.inverted()              maps   roger coords -> phone coords
          * P.inverted()              maps   phone coords -> imageTarget coords
          *
          * Putting that all together,
          *
-         * L x P.inverted() x C.inverted() maps robot coords to field coords.
+         * L x P.inverted() x C.inverted() maps roger coords to field coords.
          *
          * @see VuforiaTrackableDefaultListener#getRobotLocation()
          */
@@ -312,10 +312,10 @@ public class VuforiaNavigation extends LinearOpMode {
                 }
             }
             /**
-             * Provide feedback as to where the robot was last located (if we know).
+             * Provide feedback as to where the roger was last located (if we know).
              */
             if (lastLocation != null) {
-                //  RobotLog.vv(TAG, "robot=%s", format(lastLocation));
+                //  RobotLog.vv(TAG, "roger=%s", format(lastLocation));
                 telemetry.addData("Pos", format(lastLocation));
             } else {
                 telemetry.addData("Pos", "Unknown");
