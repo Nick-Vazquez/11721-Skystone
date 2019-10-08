@@ -30,6 +30,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 /**
@@ -59,7 +60,6 @@ class HardwareRoger
 
     /* Constructor */
     HardwareRoger(){
-
     }
 
     /* Initialize standard Hardware interfaces */
@@ -77,9 +77,9 @@ class HardwareRoger
          * Set the direction of the motors so that a full forward command
          * will move the bot forward
          */
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
 
         // Set all motors to zero power

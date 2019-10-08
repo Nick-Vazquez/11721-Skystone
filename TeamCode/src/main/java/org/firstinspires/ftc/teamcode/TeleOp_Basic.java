@@ -29,10 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.content.Context;
+
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 /**
- * This OpMode uses the common Pushbot hardware class to define the devices on the roger.
+ * This OpMode uses the roger hardware class to define the devices on the roger.
  * All device access is managed through the HardwarePushbot class.
  * The code is structured as a LinearOpMode
  *
@@ -51,7 +54,12 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOp_Basic extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private HardwareRoger roger             = new HardwareRoger();      // Use Roger's Hardware
+    private HardwareRoger roger = new HardwareRoger();      // Use Roger's Hardware
+
+    private String[] sounds = {"ss_alarm", "ss_light_saber"};
+
+    // Flag to determine if sounds are playing
+    private boolean soundsPlaying = false;
 
     @Override
     public void runOpMode() {
@@ -64,6 +72,13 @@ public class TeleOp_Basic extends LinearOpMode {
         double frontRightPower;
         double backLeftPower;
         double backRightPower;
+
+        int soundID = -1;
+        Context myApp = hardwareMap.appContext;
+
+        SoundPlayer.PlaySoundParams params = new SoundPlayer.PlaySoundParams();
+        params.loopControl = 0;
+        params.waitForNonLoopingSoundsToFinish = true;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -102,6 +117,23 @@ public class TeleOp_Basic extends LinearOpMode {
                 direction = "Left";
             } else {
                 direction = "Stopped";
+            }
+
+            // Look for if the x button is pressed and if there
+            // is a sound currently playing
+            if (gamepad1.x && !soundsPlaying) {
+                // Determine Resource IDs for the sounds you want to play, and make sure it's valid.
+                if ((soundID = myApp.getResources().getIdentifier("ss_light_saber", "raw", myApp.getPackageName())) != 0) {
+                    soundsPlaying = true;
+                    SoundPlayer.getInstance().startPlaying(myApp, soundID, params, null,
+                            new Runnable() {
+                                @Override
+                                public void run() {
+                                    soundsPlaying = false;
+                                }
+                            });
+                }
+
             }
 
             // Output the safe vales to the motor drives.
