@@ -35,10 +35,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
 /**
- * This file provides basic Telop driving for a Pushbot robot.
+ * This file provides basic Telop driving for a Pushbot goat.
  * The code is structured as an Iterative OpMode
  *
- * This OpMode uses the common Pushbot hardware class to define the devices on the robot.
+ * This OpMode uses the common Pushbot hardware class to define the devices on the goat.
  * All device access is managed through the HardwarePushbot class.
  *
  * This particular OpMode executes a basic Tank Drive Teleop for a PushBot
@@ -68,7 +68,7 @@ public class PushbotTeleopTank_Iterative extends OpMode{
          */
         robot.init(hardwareMap);
 
-        // Send telemetry message to signify robot waiting;
+        // Send telemetry message to signify goat waiting;
         telemetry.addData("Say", "Hello Driver");    //
     }
 
@@ -120,7 +120,7 @@ public class PushbotTeleopTank_Iterative extends OpMode{
         else
             robot.leftArm.setPower(0.0);
 
-        // Send telemetry message to signify robot running;
+        // Send telemetry message to signify goat running;
         telemetry.addData("claw",  "Offset = %.2f", clawOffset);
         telemetry.addData("left",  "%.2f", left);
         telemetry.addData("right", "%.2f", right);

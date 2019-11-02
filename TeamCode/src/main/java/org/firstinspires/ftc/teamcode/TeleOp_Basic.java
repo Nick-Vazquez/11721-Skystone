@@ -29,10 +29,19 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.content.Context;
+import android.util.Log;
+
+import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
+
 /**
- * This OpMode uses the common Pushbot hardware class to define the devices on the roger.
+ * This OpMode uses the roger hardware class to define the devices on the roger.
  * All device access is managed through the HardwarePushbot class.
  * The code is structured as a LinearOpMode
  *
@@ -51,11 +60,23 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOp_Basic extends LinearOpMode {
 
     /* Declare OpMode members. */
-    private HardwareRoger roger             = new HardwareRoger();      // Use Roger's Hardware
+    private HardwareRoger roger = new HardwareRoger();      // Use Roger's Hardware
+    private ElapsedTime runtime = new ElapsedTime();
+
+    private String[] sounds = {"ss_alarm", "ss_light_saber"};
+
+    // Flag to determine if sounds are playing
+    private boolean soundPlaying    = false;
+
+    private boolean isGrabberDown   = false;
+    private boolean isHolderDown    = false;
+
+    private static final double COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    private static final int POSITION_UP             = 0;
+    private static final int POSITION_DOWN           = 1;
 
     @Override
     public void runOpMode() {
-        String direction;
         double forward;
         double side;
         double rotation;
@@ -64,6 +85,13 @@ public class TeleOp_Basic extends LinearOpMode {
         double frontRightPower;
         double backLeftPower;
         double backRightPower;
+
+        int soundID = -1;
+        Context myApp = hardwareMap.appContext;
+
+        SoundPlayer.PlaySoundParams params = new SoundPlayer.PlaySoundParams();
+        params.loopControl = 0;
+        params.waitForNonLoopingSoundsToFinish = true;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
@@ -92,16 +120,55 @@ public class TeleOp_Basic extends LinearOpMode {
             frontRightPower = forward - side - rotation;
             frontLeftPower = forward + side + rotation;
 
-            if (forward > 0) {
-                direction = "Forward";
-            } else if (forward < 0) {
-                direction = "Backward";
-            } else if (side > 0) {
-                direction = "Right";
-            } else if (side < 0) {
-                direction = "Left";
+            // Look for trigger to see if we should play sound
+            // Only start a new sound if we are currently not playing one.
+            if (gamepad1.right_bumper && !soundPlaying) {
+
+                // Determine Resource IDs for the sounds you want to play, and make sure it's valid.
+                if ((soundID = myApp.getResources().getIdentifier("ss_wookie", "raw", myApp.getPackageName())) != 0){
+
+                    // Signal that the sound is now playing.
+                    soundPlaying = true;
+
+                    // Start playing, and also Create a callback that will clear the playing flag when the sound is complete.
+                    SoundPlayer.getInstance().startPlaying(myApp, soundID, params, null,
+                            new Runnable() {
+                                public void run() {
+                                    soundPlaying = false;
+                                }} );
+                }
+            }
+
+            if (gamepad2.right_bumper) {
+                roger.clawServo.setPower(HardwareRoger.CLAW_CLOSE_POWER);
+                telemetry.addData("Claw", "Claw Closing!");
             } else {
-                direction = "Stopped";
+                roger.clawServo.setPower(HardwareRoger.CLAW_STOP);
+                telemetry.addData("Claw", "Claw Stopped!");
+            }
+
+            if (gamepad2.x) {
+                if (isGrabberDown) {
+                    moveGrabber(POSITION_UP);
+                    isGrabberDown = false;
+                } else {
+                    moveGrabber(POSITION_DOWN);
+                    isGrabberDown = true;
+                }
+            }
+
+            if (gamepad2.y) {
+                if (isHolderDown) {
+                    roger.holderLeft.setPosition(HardwareRoger.LEFT_HOLDER_OPEN_POS);
+                    roger.holderRight.setPosition(HardwareRoger.RIGHT_HOLDER_OPEN_POS);
+                    isHolderDown = false;
+                    sleep(100);
+                } else {
+                    roger.holderLeft.setPosition(HardwareRoger.LEFT_HOLDER_CLOSE_POS);
+                    roger.holderRight.setPosition(HardwareRoger.RIGHT_HOLDER_CLOSE_POS);
+                    isHolderDown = true;
+                    sleep(100);
+                }
             }
 
             // Output the safe vales to the motor drives.
@@ -115,8 +182,49 @@ public class TeleOp_Basic extends LinearOpMode {
             telemetry.addData("frontRight", "%.2f", frontRightPower);
             telemetry.addData("backLeft", "%.2f", backLeftPower);
             telemetry.addData("backRight", "%.2f", backRightPower);
-            telemetry.addData("Direction", direction);
+            telemetry.addData("Grabber", isGrabberDown); 
             telemetry.update();
+        }
+    }
+
+    private void moveGrabber(int position) {
+        int newGrabberTarget;
+        double rotations    = 0;
+        double timeoutS     = 2;
+
+        if (position == POSITION_UP){
+            rotations = 0.4;
+        } else if (position == POSITION_DOWN) {
+            rotations = -0.4;
+        } else {
+            telemetry.addData("Position", "No position data found!");
+        }
+
+        if (opModeIsActive()) {
+            newGrabberTarget = roger.grabber.getCurrentPosition() +
+                    (int)(rotations * COUNTS_PER_MOTOR_REV);
+
+            roger.grabber.setTargetPosition(newGrabberTarget);
+
+            // Enable RUN_TO_POSITION
+            roger.grabber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // Reset timeout time, start to move
+            runtime.reset();
+
+            roger.grabber.setPower(0.5);
+
+            while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
+                    (roger.grabber.isBusy())) {
+
+                // Display the current data for the driver
+                telemetry.addData("Grabber", "Running to %2d, Currently %2d",
+                        newGrabberTarget, roger.grabber.getCurrentPosition());
+            }
+
+            // After the moves are over, set motor power to 0
+            roger.grabber.setPower(0);
+            roger.grabber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
 }

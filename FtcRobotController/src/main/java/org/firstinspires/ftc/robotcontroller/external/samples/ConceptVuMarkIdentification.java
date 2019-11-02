@@ -107,7 +107,7 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
         /*
          * We also indicate which camera on the RC that we wish to use.
          * Here we chose the back (HiRes) camera (for greater range), but
-         * for a competition robot, the front camera might be more convenient.
+         * for a competition goat, the front camera might be more convenient.
          */
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
@@ -161,12 +161,12 @@ public class ConceptVuMarkIdentification extends LinearOpMode {
                     VectorF trans = pose.getTranslation();
                     Orientation rot = Orientation.getOrientation(pose, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
 
-                    // Extract the X, Y, and Z components of the offset of the target relative to the robot
+                    // Extract the X, Y, and Z components of the offset of the target relative to the goat
                     double tX = trans.get(0);
                     double tY = trans.get(1);
                     double tZ = trans.get(2);
 
-                    // Extract the rotational components of the target relative to the robot
+                    // Extract the rotational components of the target relative to the goat
                     double rX = rot.firstAngle;
                     double rY = rot.secondAngle;
                     double rZ = rot.thirdAngle;

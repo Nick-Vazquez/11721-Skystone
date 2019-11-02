@@ -29,8 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import android.app.Activity;
+import android.graphics.Color;
+import android.view.View;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -61,8 +66,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Pushbot: Auto Drive By Encoder", group="Roger")
-public class DriveByEncoder extends LinearOpMode {
+@Autonomous(name="Drive By Encoder: Blue Building", group="Roger")
+public class DriveByEncoderBlueBuilding extends LinearOpMode {
 
     /* Declare OpMode members. */
     // TODO: You know what to do...
@@ -86,9 +91,18 @@ public class DriveByEncoder extends LinearOpMode {
          */
         roger.init(hardwareMap);
 
+        // hsvValues is an array that will hold the hue, saturation, and value information.
+        float[] hsvValues = {0F, 0F, 0F};
+
+        // sometimes it helps to multiply the raw RGB values with a scale factor
+        // to amplify/attenuate the measured values.
+        final double SCALE_FACTOR = 255;
+
         // Send telemetry message to signify roger waiting;
         telemetry.addData("Status", "Resetting Encoders");    //
         telemetry.update();
+
+        ColorSensor sensorColor = roger.sensorColor;
 
         allMotorsStopResetEncoder();
 
@@ -103,15 +117,37 @@ public class DriveByEncoder extends LinearOpMode {
 
         telemetry.update();
 
+        // get a reference to the RelativeLayout so we can change the background
+        // color of the Robot Controller app to match the hue detected by the RGB sensor.
+        int relativeLayoutId = hardwareMap.appContext.getResources().getIdentifier("RelativeLayout", "id", hardwareMap.appContext.getPackageName());
+        final View relativeLayout = ((Activity) hardwareMap.appContext).findViewById(relativeLayoutId);
+
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         mechFwdRev(DRIVE_SPEED,12,  5);  // S1: Forward 12 Inches with 5 Sec timeout
-        mechFwdRev(DRIVE_SPEED,-12, 6);  // S2: Backward 12 Inches with 5 Sec timeout
-        mechLeftRight(DRIVE_SPEED,24, 10);  // S3: Right 12 Inches with 5 Sec timeout
-        mechLeftRight(DRIVE_SPEED,-24, 11);  // S3: Left 12 Inches with 5 Sec timeout
+        mechLeftRight(DRIVE_SPEED,7, 5);  // S3: Right 12 Inches with 5 Sec timeout
+        mechFwdRev(DRIVE_SPEED,55, 6);  // S2: Backward 12 Inches with 5 Sec timeout
+        mechLeftRight(DRIVE_SPEED,24, 11);  // S3: Left 12 Inches with 5 Sec timeout
+        mechFwdRev(DRIVE_SPEED, -50, 6);
+        mechLeftRight(DRIVE_SPEED, -20, 5);
+        mechFwdRev(DRIVE_SPEED, -5, 5);
+
+        while (opModeIsActive() && hsvValues[0] < 190) {
+            Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
+                    (int) (sensorColor.green() * SCALE_FACTOR),
+                    (int) (sensorColor.blue() * SCALE_FACTOR),
+                    hsvValues);
+
+            roger.frontRight.setPower(-DRIVE_SPEED);
+            roger.frontLeft.setPower(DRIVE_SPEED);
+            roger.backRight.setPower(DRIVE_SPEED);
+            roger.backLeft.setPower(-DRIVE_SPEED);
+        }
+
+        allMotorsOff();
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -123,7 +159,6 @@ public class DriveByEncoder extends LinearOpMode {
      * @param distance Distance to be travelled by Roger (Positive value indicates forward travel)
      * @param timeoutS timeout(seconds) for command to be completed
      */
-    // TODO: You know what to do...
     private void mechFwdRev(double power, double distance, double timeoutS) {
         int newFLTarget;
         int newFRTarget;
@@ -133,11 +168,11 @@ public class DriveByEncoder extends LinearOpMode {
         if (opModeIsActive()) {
             newFLTarget = roger.frontLeft.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
-            newFRTarget = roger.frontLeft.getCurrentPosition() +
+            newFRTarget = roger.frontRight.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
-            newBLTarget = roger.frontLeft.getCurrentPosition() +
+            newBLTarget = roger.backLeft.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
-            newBRTarget = roger.frontLeft.getCurrentPosition() +
+            newBRTarget = roger.backRight.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
 
             setTargetPosition(newFLTarget, newFRTarget, newBLTarget, newBRTarget);
@@ -181,7 +216,6 @@ public class DriveByEncoder extends LinearOpMode {
      */
     // TODO: You know what to do...
     private void mechLeftRight(double power, double distance, double timeoutS) {
-        // TODO: I have a feeling this method is going to need some help
         int newFLTarget;
         int newFRTarget;
         int newBLTarget;

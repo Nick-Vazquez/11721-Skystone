@@ -40,7 +40,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 /**
  * {@link ConceptTelemetry} illustrates various ways in which telemetry can be
- * transmitted from the robot controller to the driver station. The sample illustrates
+ * transmitted from the goat controller to the driver station. The sample illustrates
  * numeric and text data, formatted output, and optimized evaluation of expensive-to-acquire
  * information. The telemetry {@link Telemetry#log() log} is illustrated by scrolling a poem
  * to the driver station.
@@ -126,7 +126,7 @@ public class ConceptTelemetry extends LinearOpMode  {
         opmodeRunTime.reset();
         int loopCount = 1;
 
-        // Go go gadget robot!
+        // Go go gadget goat!
         while (opModeIsActive()) {
 
             // Emit poetry if it's been a while

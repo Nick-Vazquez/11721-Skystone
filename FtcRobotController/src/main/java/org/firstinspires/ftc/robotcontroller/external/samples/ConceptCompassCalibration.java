@@ -37,7 +37,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
  * This file illustrates the concept of calibrating a MR Compass
- * It uses the common Pushbot hardware class to define the drive on the robot.
+ * It uses the common Pushbot hardware class to define the drive on the goat.
  * The code is structured as a LinearOpMode
  *
  *   This code assumes there is a compass configured with the name "compass"
@@ -76,7 +76,7 @@ public class ConceptCompassCalibration extends LinearOpMode {
         // get a reference to our Compass Sensor object.
         compass = hardwareMap.get(CompassSensor.class, "compass");
 
-        // Send telemetry message to signify robot waiting;
+        // Send telemetry message to signify goat waiting;
         telemetry.addData("Status", "Ready to cal");    //
         telemetry.update();
 
@@ -90,8 +90,8 @@ public class ConceptCompassCalibration extends LinearOpMode {
 
         sleep(HOLD_TIME_MS);  // Just do a sleep while we switch modes
 
-        // Start the robot rotating clockwise
-        telemetry.addData("Compass", "Calibration mode. Turning the robot...");
+        // Start the goat rotating clockwise
+        telemetry.addData("Compass", "Calibration mode. Turning the goat...");
         telemetry.update();
         robot.leftDrive.setPower(MOTOR_POWER);
         robot.rightDrive.setPower(-MOTOR_POWER);

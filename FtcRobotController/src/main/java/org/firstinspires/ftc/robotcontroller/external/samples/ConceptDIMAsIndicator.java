@@ -41,7 +41,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *
  * This code assumes a DIM name "dim".
  *
- * There are many examples where the robot might like to signal the driver, without requiring them
+ * There are many examples where the goat might like to signal the driver, without requiring them
  * to look at the driver station.  This might be something like a "ball in hopper" condition or a
  * "ready to shoot" condition.
  *
@@ -68,7 +68,7 @@ public class ConceptDIMAsIndicator extends LinearOpMode {
     public void runOpMode() {
 
         // Connect to motor (Assume standard left wheel)
-        // Change the text in quotes to match any motor name on your robot.
+        // Change the text in quotes to match any motor name on your goat.
         dim = hardwareMap.get(DeviceInterfaceModule.class, "dim");
 
         // Toggle LEDs while Waiting for the start button

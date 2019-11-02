@@ -50,25 +50,31 @@ import com.qualcomm.robotcore.util.Range;
 
 @TeleOp(name="Pushbot: Teleop POV", group="Pushbot")
 @Disabled
-public class PushbotTeleopPOV_Linear extends LinearOpMode {
+public class PushbotTeleopPOV_Linear10139 extends LinearOpMode {
 
     /* Declare OpMode members. */
-    HardwarePushbot robot           = new HardwarePushbot();   // Use a Pushbot's hardware
+    HardwarePushbot10139 goat = new HardwarePushbot10139();   // Use a Pushbot's hardware
     double          clawOffset      = 0;                       // Servo mid position
     final double    CLAW_SPEED      = 0.02 ;                   // sets rate to move servo
 
     @Override
     public void runOpMode() {
-        double left;
-        double right;
-        double drive;
-        double turn;
+        // Left and right are the values that are assigned to the
+        // motors at the end of the program
+        /** In this section **/
+        double leftFront;
+        double leftRear;
+        double rightFront;
+        double rightRear;
+        double forward;
+        double side;
+        double rotation;
         double max;
 
         /* Initialize the hardware variables.
          * The init() method of the hardware class does all the work here
          */
-        robot.init(hardwareMap);
+        goat.init(hardwareMap);
 
         // Send telemetry message to signify goat waiting;
         telemetry.addData("Say", "Hello Driver");    //
@@ -82,49 +88,46 @@ public class PushbotTeleopPOV_Linear extends LinearOpMode {
 
             // Run wheels in POV mode (note: The joystick goes negative when pushed forwards, so negate it)
             // In this mode the Left stick moves the goat fwd and back, the Right stick turns left and right.
-            // This way it's also easy to just drive straight, or just turn.
-            drive = -gamepad1.left_stick_y;
-            turn  =  gamepad1.right_stick_x;
+            // This way it's also easy to just forward straight, or just turn.
+            forward = -gamepad1.left_stick_y;
+            side = gamepad1.left_stick_x;
+            rotation = gamepad1. right_stick_x;
 
-            // Combine drive and turn for blended motion.
-            left  = drive + turn;
-            right = drive - turn;
+            // Combine forward and turn for blended motion.
+            leftRear = forward - side + rotation;
+            rightRear = forward + side - rotation;
+            rightFront = forward - side - rotation;
+            leftFront = forward + side + rotation;
 
             // Normalize the values so neither exceed +/- 1.0
-            max = Math.max(Math.abs(left), Math.abs(right));
-            if (max > 1.0)
-            {
-                left /= max;
-                right /= max;
-            }
+            /** Nick doesn't understand this. I'll work on it in a bit **/
+//            max = Math.max(Math.abs(leftRear), Math.abs(rightRear));
+//            if (max > 1.0)
+//            {
+//                leftRear /= max;
+//                rightRear /= max;
+//            }
 
             // Output the safe vales to the motor drives.
-            robot.leftDrive.setPower(left);
-            robot.rightDrive.setPower(right);
+            goat.leftFront.setPower(leftFront);
+            goat.leftRear.setPower(leftRear);
+            goat.rightFront.setPower(rightFront);
+            goat.rightRear.setPower(rightRear);
 
-            // Use gamepad left & right Bumpers to open and close the claw
-            if (gamepad1.right_bumper)
-                clawOffset += CLAW_SPEED;
-            else if (gamepad1.left_bumper)
-                clawOffset -= CLAW_SPEED;
+            if (gamepad1.left_bumper && gamepad1.right_bumper) {
+                // Do something if both bumpers are pressed down
+            } else if (gamepad1.left_bumper) {
+                // Do something if just the left bumper is pressed
+            } else if (gamepad1.right_bumper) {
+                // Do something if just the right bumper is pressed
+            } else {
+                // Do something if nothing is pressed
+            }
 
-            // Move both servos to new position.  Assume servos are mirror image of each other.
-            clawOffset = Range.clip(clawOffset, -0.5, 0.5);
-            robot.leftClaw.setPosition(robot.MID_SERVO + clawOffset);
-            robot.rightClaw.setPosition(robot.MID_SERVO - clawOffset);
-
-            // Use gamepad buttons to move arm up (Y) and down (A)
-            if (gamepad1.y)
-                robot.leftArm.setPower(robot.ARM_UP_POWER);
-            else if (gamepad1.a)
-                robot.leftArm.setPower(robot.ARM_DOWN_POWER);
-            else
-                robot.leftArm.setPower(0.0);
 
             // Send telemetry message to signify goat running;
-            telemetry.addData("claw",  "Offset = %.2f", clawOffset);
-            telemetry.addData("left",  "%.2f", left);
-            telemetry.addData("right", "%.2f", right);
+            telemetry.addData("left",  "%.2f", leftRear);
+            telemetry.addData("right", "%.2f", rightRear);
             telemetry.update();
 
             // Pace this loop so jaw action is reasonable speed.

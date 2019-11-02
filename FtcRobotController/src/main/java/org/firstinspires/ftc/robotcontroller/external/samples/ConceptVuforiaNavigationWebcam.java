@@ -63,7 +63,7 @@ import java.util.Locale;
 
 /**
  * This 2016-2017 OpMode illustrates the basics of using the Vuforia localizer to determine
- * positioning and orientation of robot on the FTC field.
+ * positioning and orientation of goat on the FTC field.
  * The code is structured as a LinearOpMode
  *
  * Vuforia uses the phone's camera to inspect it's surroundings, and attempt to locate target images.
@@ -78,8 +78,8 @@ import java.util.Locale;
  * The two vision target are located on the two walls closest to the audience, facing in.
  * The Stones are on the RED side of the field, and the Chips are on the Blue side.
  *
- * A final calculation then uses the location of the camera on the robot to determine the
- * robot's location and orientation on the field.
+ * A final calculation then uses the location of the camera on the goat to determine the
+ * goat's location and orientation on the field.
  *
  * @see VuforiaLocalizer
  * @see VuforiaTrackableDefaultListener
@@ -114,7 +114,7 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
 
     /**
      * This is the webcam we are to use. As with other hardware devices such as motors and
-     * servos, this device is identified using the robot configuration tool in the FTC application.
+     * servos, this device is identified using the goat configuration tool in the FTC application.
      */
     WebcamName webcamName;
 
@@ -197,12 +197,12 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
          * target configuration files *must* correspond for the math to work out correctly.
          */
         float mmPerInch        = 25.4f;
-        float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your robot
+        float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your goat
         float mmFTCFieldWidth  = (12*12 - 2) * mmPerInch;   // the FTC field is ~11'10" center-to-center of the glass panels
 
         /**
          * In order for localization to work, we need to tell the system where each target we
-         * wish to use for navigation resides on the field, and we need to specify where on the robot
+         * wish to use for navigation resides on the field, and we need to specify where on the goat
          * the camera resides. These specifications are in the form of <em>transformation matrices.</em>
          * Transformation matrices are a central, important concept in the math here involved in localization.
          * See <a href="https://en.wikipedia.org/wiki/Transformation_matrix">Transformation Matrix</a>
@@ -250,7 +250,7 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
          * In this configuration, the target's coordinate system aligns with that of the field.
          *
          * In a real situation we'd also account for the vertical (Z) offset of the target,
-         * but for simplicity, we ignore that here; for a real robot, you'll want to fix that.
+         * but for simplicity, we ignore that here; for a real goat, you'll want to fix that.
          *
          * To place the Stones Target on the Red Audience wall:
          * - First we rotate it 90 around the field's X axis to flip it upright
@@ -285,14 +285,14 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
         RobotLog.ii(TAG, "Blue Target=%s", format(blueTargetLocationOnField));
 
         /**
-         * We also need to tell Vuforia where the <em>cameras</em> are relative to the robot.
+         * We also need to tell Vuforia where the <em>cameras</em> are relative to the goat.
          *
          * Just as there is a Field Coordinate System, so too there is a Robot Coordinate System.
          * The two share many similarities. The origin of the Robot Coordinate System is wherever
-         * you choose to make it on the robot, but typically you'd choose somewhere in the middle
-         * of the robot. From that origin, the Y axis is horizontal and positive out towards the
-         * "front" of the robot (however you choose "front" to be defined), the X axis is horizontal
-         * and positive out towards the "right" of the robot (i.e.: 90deg horizontally clockwise from
+         * you choose to make it on the goat, but typically you'd choose somewhere in the middle
+         * of the goat. From that origin, the Y axis is horizontal and positive out towards the
+         * "front" of the goat (however you choose "front" to be defined), the X axis is horizontal
+         * and positive out towards the "right" of the goat (i.e.: 90deg horizontally clockwise from
          * the positive Y axis), and the Z axis is vertical towards the sky.
          *
          * Similarly, for each camera there is a Camera Coordinate System. The origin of a Camera
@@ -306,7 +306,7 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
          * Next, there is Phone Coordinate System (for robots that have phones, of course), though
          * with the advent of Vuforia support for Webcams, this coordinate system is less significant
          * than it was previously. The Phone Coordinate System is defined thusly: with the phone in
-         * flat front of you in portrait mode (i.e. as it is when running the robot controller app)
+         * flat front of you in portrait mode (i.e. as it is when running the goat controller app)
          * and you are staring straight at the face of the phone,
          *     * X is positive heading off to your right,
          *     * Y is positive heading up through the top edge of the phone, and
@@ -328,13 +328,13 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
          * systems also coincide with the Robot Coordinate System. Got it?
          *
          * In this example here, we're going to assume that we put the camera on the right side
-         * of the robot (facing outwards, of course). To determine the transformation matrix that
+         * of the goat (facing outwards, of course). To determine the transformation matrix that
          * describes that location, first consider the camera as lying on its back at the origin
          * of the Robot Coordinate System such that the Camera Coordinate System and Robot Coordinate
          * System coincide. Then the transformation we need is
-         *      * first a rotation of the camera by +90deg along the robot X axis,
-         *      * then a rotation of the camera by +90deg along the robot Z axis, and
-         *      * finally a translation of the camera to the side of the robot.
+         *      * first a rotation of the camera by +90deg along the goat X axis,
+         *      * then a rotation of the camera by +90deg along the goat Z axis, and
+         *      * finally a translation of the camera to the side of the goat.
          *
          * When determining whether a rotation is positive or negative, consider yourself as looking
          * down the (positive) axis of rotation from the positive towards the origin. Positive rotations
@@ -361,18 +361,18 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
         /**
          * A brief tutorial: here's how all the math is going to work:
          *
-         * C = robotFromCamera          maps   camera coords -> robot coords
+         * C = robotFromCamera          maps   camera coords -> goat coords
          * P = tracker.getPose()        maps   image target coords -> camera coords
          * L = redTargetLocationOnField maps   image target coords -> field coords
          *
          * So
          *
-         * C.inverted()                 maps   robot coords -> camera coords
+         * C.inverted()                 maps   goat coords -> camera coords
          * P.inverted()                 maps   camera coords -> imageTarget coords
          *
          * Putting that all together,
          *
-         * L x P.inverted() x C.inverted() maps robot coords to field coords.
+         * L x P.inverted() x C.inverted() maps goat coords to field coords.
          *
          * @see VuforiaTrackableDefaultListener#getRobotLocation()
          */
@@ -407,10 +407,10 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
                 }
             }
             /**
-             * Provide feedback as to where the robot was last located (if we know).
+             * Provide feedback as to where the goat was last located (if we know).
              */
             if (lastLocation != null) {
-                //  RobotLog.vv(TAG, "robot=%s", format(lastLocation));
+                //  RobotLog.vv(TAG, "goat=%s", format(lastLocation));
                 telemetry.addData("Pos", format(lastLocation));
             } else {
                 telemetry.addData("Pos", "Unknown");
@@ -428,10 +428,10 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
     }
 
     /**
-     * Sample one frame from the Vuforia stream and write it to a .PNG image file on the robot
+     * Sample one frame from the Vuforia stream and write it to a .PNG image file on the goat
      * controller in the /sdcard/FIRST/data directory. The images can be downloaded using Android
      * Studio's Device File Explorer, ADB, or the Media Transfer Protocol (MTP) integration into
-     * Windows Explorer, among other means. The images can be useful during robot design and calibration
+     * Windows Explorer, among other means. The images can be useful during goat design and calibration
      * in order to get a sense of what the camera is actually seeing and so assist in camera
      * aiming and alignment.
      */

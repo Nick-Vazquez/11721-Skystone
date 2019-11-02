@@ -29,8 +29,12 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * This is NOT an opmode.
@@ -53,13 +57,29 @@ class HardwareRoger
     DcMotor frontRight  = null;
     DcMotor backLeft    = null;
     DcMotor backRight   = null;
+    DcMotor grabber     = null;
+
+    CRServo clawServo   = null;
+
+    Servo holderLeft    = null;
+    Servo holderRight   = null;
+
+    ColorSensor sensorColor = null;
+
+    static final double CLAW_OPEN_POWER      =  1;
+    static final double CLAW_CLOSE_POWER     = -1;
+    static final double CLAW_STOP            = 0;
+
+    static final double LEFT_HOLDER_OPEN_POS    = 0.9;
+    static final double LEFT_HOLDER_CLOSE_POS   = 0.1;
+    static final double RIGHT_HOLDER_OPEN_POS   = 0.1;
+    static final double RIGHT_HOLDER_CLOSE_POS  = 0.9;
 
     /* local OpMode members. */
     private HardwareMap hwMap           =  null;
 
     /* Constructor */
     HardwareRoger(){
-
     }
 
     /* Initialize standard Hardware interfaces */
@@ -72,21 +92,24 @@ class HardwareRoger
         frontRight  = hwMap.get(DcMotor.class,"frontRight");
         backLeft    = hwMap.get(DcMotor.class, "backLeft");
         backRight   = hwMap.get(DcMotor.class, "backRight");
+        grabber     = hwMap.get(DcMotor.class, "grabber");
 
         /*
          * Set the direction of the motors so that a full forward command
          * will move the bot forward
          */
-        frontLeft.setDirection(DcMotor.Direction.FORWARD);
+        frontLeft.setDirection(DcMotor.Direction.REVERSE);
         frontRight.setDirection(DcMotor.Direction.FORWARD);
-        backLeft.setDirection(DcMotor.Direction.FORWARD);
+        backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
+        grabber.setDirection(DcMotor.Direction.REVERSE);
 
         // Set all motors to zero power
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
+        grabber.setPower(0);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
@@ -94,6 +117,17 @@ class HardwareRoger
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        grabber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        clawServo   = hwMap.get(CRServo.class, "claw");
+        clawServo.setPower(CLAW_STOP);
+
+        holderLeft  = hwMap.get(Servo.class, "holderLeft");
+        holderLeft.setPosition(LEFT_HOLDER_CLOSE_POS);
+        holderRight = hwMap.get(Servo.class, "holderRight");
+        holderRight.setPosition(RIGHT_HOLDER_CLOSE_POS);
+
+        sensorColor = hwMap.get(ColorSensor.class, "color");
     }
  }
 

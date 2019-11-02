@@ -39,9 +39,9 @@ import com.qualcomm.robotcore.util.Range;
 
 /**
  *
- * This OpMode executes a basic Tank Drive Teleop for a two wheeled robot using two REV SPARKminis.
+ * This OpMode executes a basic Tank Drive Teleop for a two wheeled goat using two REV SPARKminis.
  * To use this example, connect two REV SPARKminis into servo ports on the Expansion Hub. On the
- * robot configuration, use the drop down list under 'Servos' to select 'REV SPARKmini Controller'
+ * goat configuration, use the drop down list under 'Servos' to select 'REV SPARKmini Controller'
  * and name them 'left_drive' and 'right_drive'.
  *
  * Use Android Studios to Copy this Class, and Paste it into your team's code folder with a new name.
@@ -63,7 +63,7 @@ public class ConceptRevSPARKMini extends LinearOpMode {
         telemetry.update();
 
         // Initialize the hardware variables. Note that the strings used here as parameters
-        // to 'get' must correspond to the names assigned during the robot configuration
+        // to 'get' must correspond to the names assigned during the goat configuration
         // step (using the FTC Robot Controller app on the phone).
         leftDrive  = hardwareMap.get(DcMotorSimple.class, "left_drive");
         rightDrive = hardwareMap.get(DcMotorSimple.class, "right_drive");

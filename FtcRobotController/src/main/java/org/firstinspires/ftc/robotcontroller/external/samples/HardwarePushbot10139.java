@@ -29,9 +29,9 @@
 
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 /**
@@ -44,32 +44,42 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * This hardware class assumes the following device names have been configured on the goat:
  * Note:  All names are lower case and some have single spaces between words.
  *
- * Motor channel:  Left  drive motor:        "left_drive"
- * Motor channel:  Right drive motor:        "right_drive"
- * Motor channel:  Manipulator drive motor:  "left_arm"
- * Servo channel:  Servo to open left claw:  "left_hand"
- * Servo channel:  Servo to open right claw: "right_hand"
+ * Motor channel:  Left Front drive motor:  "left_front"
+ * Motor channel:  Left Rear drive motor:   "left_rear"
+ * Motor channel:  Right Front drive motor: "right_front"
+ * Motor channel:  Right Read drive motor:  "right_rear
+ *
+ * For use with 10139 SKYSTONE Season
  */
-public class HardwarePushbot
-{
-    /* Public OpMode members. */
-    public DcMotor  leftDrive   = null;
-    public DcMotor  rightDrive  = null;
-    public DcMotor  leftArm     = null;
-    public Servo    leftClaw    = null;
-    public Servo    rightClaw   = null;
 
-    public static final double MID_SERVO       =  0.5 ;
-    public static final double ARM_UP_POWER    =  0.45 ;
-    public static final double ARM_DOWN_POWER  = -0.45 ;
+public class HardwarePushbot10139 {
+
+    /*
+     * Declare the members used
+     * A member is just something that is used in other programs
+     * to reference a type of motor, servo, etc...
+     * Make sure that every member is set to null
+     */
+    public DcMotor  leftFront   = null;
+    public DcMotor  leftRear    = null;
+    public DcMotor  rightFront  = null;
+    public DcMotor  rightRear   = null;
+
+    // This is an example servo declaration. If you add a servo, uncomment this (Remove the slashes)
+    public CRServo leftClaw    = null;
+
+    // These are not used at the moment because of the lack of servos
+    // Uncomment them or copy them with other values when using servos
+//    public static final double MID_SERVO       =  0.5 ;
+    public static final double CLAW_OPEN_POWER    =  0.5 ;
+    public static final double CLAW_CLOSE_POWER  = -0.5 ;
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;
     private ElapsedTime period  = new ElapsedTime();
 
     /* Constructor */
-    public HardwarePushbot(){
-
+    public HardwarePushbot10139(){
     }
 
     /* Initialize standard Hardware interfaces */
@@ -78,28 +88,36 @@ public class HardwarePushbot
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        leftDrive  = hwMap.get(DcMotor.class, "left_drive");
-        rightDrive = hwMap.get(DcMotor.class, "right_drive");
-        leftArm    = hwMap.get(DcMotor.class, "left_arm");
-        leftDrive.setDirection(DcMotor.Direction.FORWARD); // Set to REVERSE if using AndyMark motors
-        rightDrive.setDirection(DcMotor.Direction.REVERSE);// Set to FORWARD if using AndyMark motors
+        leftFront  = hwMap.get(DcMotor.class, "left_front");
+        leftRear = hwMap.get(DcMotor.class, "left_rear");
+        rightFront  = hwMap.get(DcMotor.class, "right_front");
+        rightRear = hwMap.get(DcMotor.class, "right_rear");
+
+        /*
+         * Set the direction of the motors so that a full forward command
+         * will move the bot forward
+         */
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        rightRear.setDirection(DcMotor.Direction.FORWARD);
 
         // Set all motors to zero power
-        leftDrive.setPower(0);
-        rightDrive.setPower(0);
-        leftArm.setPower(0);
+        leftFront.setPower(0);
+        leftRear.setPower(0);
+        rightFront.setPower(0);
+        rightRear.setPower(0);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
-        leftDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rightDrive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        leftArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightRear.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Define and initialize ALL installed servos.
-        leftClaw  = hwMap.get(Servo.class, "left_hand");
-        rightClaw = hwMap.get(Servo.class, "right_hand");
-        leftClaw.setPosition(MID_SERVO);
-        rightClaw.setPosition(MID_SERVO);
+//        leftClaw  = hwMap.get(Servo.class, "left_hand");
+//        leftClaw.setPosition(MID_SERVO);
     }
  }
 
