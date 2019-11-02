@@ -29,22 +29,19 @@
 
 package org.firstinspires.ftc.robotcontroller.external.samples;
 
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import static org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot.MID_SERVO;
 
 /**
  * This is NOT an opmode.
  *
- * This class can be used to define all the specific hardware for a single robot.
- * In this case that robot is a Pushbot.
+ * This class can be used to define all the specific hardware for a single goat.
+ * In this case that goat is a Pushbot.
  * See PushbotTeleopTank_Iterative and others classes starting with "Pushbot" for usage examples.
  *
- * This hardware class assumes the following device names have been configured on the robot:
+ * This hardware class assumes the following device names have been configured on the goat:
  * Note:  All names are lower case and some have single spaces between words.
  *
  * Motor channel:  Left Front drive motor:  "left_front"
@@ -69,13 +66,13 @@ public class HardwarePushbot10139 {
     public DcMotor  rightRear   = null;
 
     // This is an example servo declaration. If you add a servo, uncomment this (Remove the slashes)
-//    public Servo    leftClaw    = null;
+    public CRServo leftClaw    = null;
 
     // These are not used at the moment because of the lack of servos
     // Uncomment them or copy them with other values when using servos
 //    public static final double MID_SERVO       =  0.5 ;
-//    public static final double ARM_UP_POWER    =  0.45 ;
-//    public static final double ARM_DOWN_POWER  = -0.45 ;
+    public static final double CLAW_OPEN_POWER    =  0.5 ;
+    public static final double CLAW_CLOSE_POWER  = -0.5 ;
 
     /* local OpMode members. */
     HardwareMap hwMap           =  null;

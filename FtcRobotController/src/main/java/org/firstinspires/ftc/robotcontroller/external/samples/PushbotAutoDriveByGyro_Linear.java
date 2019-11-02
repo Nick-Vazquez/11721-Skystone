@@ -39,7 +39,7 @@ import com.qualcomm.robotcore.util.Range;
 
 /**
  * This file illustrates the concept of driving a path based on Gyro heading and encoder counts.
- * It uses the common Pushbot hardware class to define the drive on the robot.
+ * It uses the common Pushbot hardware class to define the drive on the goat.
  * The code is structured as a LinearOpMode
  *
  * The code REQUIRES that you DO have encoders on the wheels,
@@ -53,15 +53,15 @@ import com.qualcomm.robotcore.util.Range;
  *
  *  This code uses the RUN_TO_POSITION mode to enable the Motor controllers to generate the run profile
  *
- *  In order to calibrate the Gyro correctly, the robot must remain stationary during calibration.
+ *  In order to calibrate the Gyro correctly, the goat must remain stationary during calibration.
  *  This is performed when the INIT button is pressed on the Driver Station.
- *  This code assumes that the robot is stationary when the INIT button is pressed.
+ *  This code assumes that the goat is stationary when the INIT button is pressed.
  *  If this is not the case, then the INIT should be performed again.
  *
  *  Note: in this example, all angles are referenced to the initial coordinate frame set during the
  *  the Gyro Calibration process, or whenever the program issues a resetZAxisIntegrator() call on the Gyro.
  *
- *  The angle of movement/rotation is assumed to be a standardized rotation around the robot Z axis,
+ *  The angle of movement/rotation is assumed to be a standardized rotation around the goat Z axis,
  *  which means that a Positive rotation is Counter Clock Wise, looking down on the field.
  *  This is consistent with the FTC field coordinate conventions set out in the document:
  *  ftc_app\doc\tutorial\FTC_FieldCoordinateSystemDefinition.pdf
@@ -85,7 +85,7 @@ public class PushbotAutoDriveByGyro_Linear extends LinearOpMode {
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
 
     // These constants define the desired driving/control characteristics
-    // The can/should be tweaked to suite the specific robot drive train.
+    // The can/should be tweaked to suite the specific goat drive train.
     static final double     DRIVE_SPEED             = 0.7;     // Nominal speed for better accuracy.
     static final double     TURN_SPEED              = 0.5;     // Nominal half speed for better accuracy.
 
@@ -104,7 +104,7 @@ public class PushbotAutoDriveByGyro_Linear extends LinearOpMode {
         robot.init(hardwareMap);
         gyro = (ModernRoboticsI2cGyro)hardwareMap.gyroSensor.get("gyro");
 
-        // Ensure the robot it stationary, then reset the encoders and calibrate the gyro.
+        // Ensure the goat it stationary, then reset the encoders and calibrate the gyro.
         robot.leftDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         robot.rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
@@ -334,10 +334,10 @@ public class PushbotAutoDriveByGyro_Linear extends LinearOpMode {
     }
 
     /**
-     * getError determines the error between the target angle and the robot's current heading
+     * getError determines the error between the target angle and the goat's current heading
      * @param   targetAngle  Desired angle (relative to global reference established at last Gyro Reset).
-     * @return  error angle: Degrees in the range +/- 180. Centered on the robot's frame of reference
-     *          +ve error means the robot should turn LEFT (CCW) to reduce error.
+     * @return  error angle: Degrees in the range +/- 180. Centered on the goat's frame of reference
+     *          +ve error means the goat should turn LEFT (CCW) to reduce error.
      */
     public double getError(double targetAngle) {
 
@@ -352,7 +352,7 @@ public class PushbotAutoDriveByGyro_Linear extends LinearOpMode {
 
     /**
      * returns desired steering force.  +/- 1 range.  +ve = steer left
-     * @param error   Error angle in robot relative degrees
+     * @param error   Error angle in goat relative degrees
      * @param PCoeff  Proportional Gain Coefficient
      * @return
      */

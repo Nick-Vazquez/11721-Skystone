@@ -36,7 +36,7 @@ import com.qualcomm.robotcore.hardware.LightSensor;
 
 /**
  * This file illustrates the concept of driving up to a line and then stopping.
- * It uses the common Pushbot hardware class to define the drive on the robot.
+ * It uses the common Pushbot hardware class to define the drive on the goat.
  * The code is structured as a LinearOpMode
  *
  * The code shows using two different light sensors:
@@ -75,8 +75,8 @@ public class PushbotAutoDriveToLine_Linear extends LinearOpMode {
         robot.init(hardwareMap);
 
         // If there are encoders connected, switch to RUN_USING_ENCODER mode for greater accuracy
-        // robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        // robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // goat.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        // goat.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         // get a reference to our Light Sensor object.
         lightSensor = hardwareMap.lightSensor.get("sensor_light");                // Primary LEGO Light Sensor
@@ -85,7 +85,7 @@ public class PushbotAutoDriveToLine_Linear extends LinearOpMode {
         // turn on LED of light sensor.
         lightSensor.enableLed(true);
 
-        // Send telemetry message to signify robot waiting;
+        // Send telemetry message to signify goat waiting;
         telemetry.addData("Status", "Ready to run");    //
         telemetry.update();
 
@@ -99,7 +99,7 @@ public class PushbotAutoDriveToLine_Linear extends LinearOpMode {
             idle();
         }
 
-        // Start the robot moving forward, and then begin looking for a white line.
+        // Start the goat moving forward, and then begin looking for a white line.
         robot.leftDrive.setPower(APPROACH_SPEED);
         robot.rightDrive.setPower(APPROACH_SPEED);
 

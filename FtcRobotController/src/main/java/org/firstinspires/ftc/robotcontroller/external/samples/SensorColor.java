@@ -59,14 +59,14 @@ public class SensorColor extends LinearOpMode {
   NormalizedColorSensor colorSensor;
   /** The relativeLayout field is used to aid in providing interesting visual feedback
    * in this sample application; you probably *don't* need something analogous when you
-   * use a color sensor on your robot */
+   * use a color sensor on your goat */
   View relativeLayout;
 
   /**
    * The runOpMode() method is the root of this LinearOpMode, as it is in all linear opModes.
    * Our implementation here, though is a bit unusual: we've decided to put all the actual work
    * in the main() method rather than directly in runOpMode() itself. The reason we do that is that
-   * in this sample we're changing the background color of the robot controller screen as the
+   * in this sample we're changing the background color of the goat controller screen as the
    * opmode runs, and we want to be able to *guarantee* that we restore it to something reasonable
    * and palatable when the opMode ends. The simplest way to do that is to use a try...finally
    * block around the main, core logic, and an easy way to make that all clear was to separate
@@ -170,7 +170,7 @@ public class SensorColor extends LinearOpMode {
       // sensor measurements don't approach their maximum limit. In such situations, the *relative*
       // intensities of the colors are likely what is most interesting. Here, for example, we boost
       // the signal on the colors while maintaining their relative balance so as to give more
-      // vibrant visual feedback on the robot controller visual display.
+      // vibrant visual feedback on the goat controller visual display.
       float max = Math.max(Math.max(Math.max(colors.red, colors.green), colors.blue), colors.alpha);
       colors.red   /= max;
       colors.green /= max;
