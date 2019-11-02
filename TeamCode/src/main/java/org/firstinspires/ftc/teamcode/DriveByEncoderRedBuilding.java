@@ -66,8 +66,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Drive By Encoder: Blue Building", group="Roger")
-public class DriveByEncoderBlueBuilding extends LinearOpMode {
+@Autonomous(name="Drive By Encoder: Red Building", group="Roger")
+public class DriveByEncoderRedBuilding extends LinearOpMode {
 
     /* Declare OpMode members. */
     // TODO: You know what to do...
@@ -127,23 +127,23 @@ public class DriveByEncoderBlueBuilding extends LinearOpMode {
         // Step through each leg of the path,
         // Note: Reverse movement is obtained by setting a negative distance (not speed)
         mechFwdRev(DRIVE_SPEED,12,  5);  // S1: Forward 12 Inches with 5 Sec timeout
-        mechLeftDrive(DRIVE_SPEED,7, 5);  // S3: Right 12 Inches with 5 Sec timeout
+        mechRightDrive(DRIVE_SPEED,7, 5);  // S3: Right 12 Inches with 5 Sec timeout
         mechFwdRev(DRIVE_SPEED,55, 6);  // S2: Backward 12 Inches with 5 Sec timeout
-        mechLeftDrive(DRIVE_SPEED,24, 11);  // S3: Left 12 Inches with 5 Sec timeout
+        mechRightDrive(DRIVE_SPEED,24, 11);  // S3: Left 12 Inches with 5 Sec timeout
         mechFwdRev(DRIVE_SPEED, -50, 6);
-        mechRightDrive(DRIVE_SPEED, 20, 5);
+        mechLeftDrive(DRIVE_SPEED, 20, 5);
         mechFwdRev(DRIVE_SPEED, -5, 5);
 
-        while (opModeIsActive() && hsvValues[0] < 190) {
+        while (opModeIsActive() && hsvValues[0] < 20) {
             Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
                     (int) (sensorColor.green() * SCALE_FACTOR),
                     (int) (sensorColor.blue() * SCALE_FACTOR),
                     hsvValues);
 
-            roger.frontRight.setPower(-DRIVE_SPEED);
-            roger.frontLeft.setPower(DRIVE_SPEED);
-            roger.backRight.setPower(DRIVE_SPEED);
-            roger.backLeft.setPower(-DRIVE_SPEED);
+            roger.frontRight.setPower(DRIVE_SPEED);
+            roger.frontLeft.setPower(-DRIVE_SPEED);
+            roger.backRight.setPower(-DRIVE_SPEED);
+            roger.backLeft.setPower(DRIVE_SPEED);
         }
 
         allMotorsOff();

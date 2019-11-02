@@ -66,8 +66,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Drive By Encoder: Blue Building", group="Roger")
-public class DriveByEncoderBlueBuilding extends LinearOpMode {
+@Autonomous(name="Cover Tape Red", group="Roger")
+public class AutoCoverTapeRED extends LinearOpMode {
 
     /* Declare OpMode members. */
     // TODO: You know what to do...
@@ -80,7 +80,7 @@ public class DriveByEncoderBlueBuilding extends LinearOpMode {
     private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
-    private static final double     DRIVE_SPEED             = 1;
+    private static final double     DRIVE_SPEED             = 0.8;
 
     @Override
     public void runOpMode() {
@@ -124,29 +124,21 @@ public class DriveByEncoderBlueBuilding extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        mechFwdRev(DRIVE_SPEED,12,  5);  // S1: Forward 12 Inches with 5 Sec timeout
-        mechLeftDrive(DRIVE_SPEED,7, 5);  // S3: Right 12 Inches with 5 Sec timeout
-        mechFwdRev(DRIVE_SPEED,55, 6);  // S2: Backward 12 Inches with 5 Sec timeout
-        mechLeftDrive(DRIVE_SPEED,24, 11);  // S3: Left 12 Inches with 5 Sec timeout
-        mechFwdRev(DRIVE_SPEED, -50, 6);
-        mechRightDrive(DRIVE_SPEED, 20, 5);
-        mechFwdRev(DRIVE_SPEED, -5, 5);
-
-        while (opModeIsActive() && hsvValues[0] < 190) {
+        while (opModeIsActive() && hsvValues[0] < 20) {
             Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
                     (int) (sensorColor.green() * SCALE_FACTOR),
                     (int) (sensorColor.blue() * SCALE_FACTOR),
                     hsvValues);
 
-            roger.frontRight.setPower(-DRIVE_SPEED);
-            roger.frontLeft.setPower(DRIVE_SPEED);
-            roger.backRight.setPower(DRIVE_SPEED);
-            roger.backLeft.setPower(-DRIVE_SPEED);
+            roger.frontRight.setPower(DRIVE_SPEED);
+            roger.frontLeft.setPower(-DRIVE_SPEED);
+            roger.backRight.setPower(-DRIVE_SPEED);
+            roger.backLeft.setPower(DRIVE_SPEED);
         }
 
         allMotorsOff();
+
+        mechRightDrive(DRIVE_SPEED, 6, 3);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -200,72 +192,6 @@ public class DriveByEncoderBlueBuilding extends LinearOpMode {
             }
 
             // After the moves are over, set motor power to 0
-            allMotorsOff();
-            allMotorsRunUsingEncoder();
-
-            // sleep(250); // Optional sleep after each move
-        }
-    }
-
-    /**
-     * Method to drive Roger right or left based on:
-     * @param power Power (-1 - 1) for motors to drive
-     * @param distance Distance to be travelled by Roger (Positive value indicates right travel)
-     * @param timeoutS timeout(seconds) for command to be completed
-     */
-    // TODO: You know what to do...
-    private void mechLeftRight(double power, double distance, double timeoutS) {
-        int newFLTarget;
-        int newFRTarget;
-        int newBLTarget;
-        int newBRTarget;
-
-        if (opModeIsActive()) {
-            newFLTarget = roger.frontLeft.getCurrentPosition() +
-                    (int)(distance * COUNTS_PER_INCH);
-            newFRTarget = roger.frontLeft.getCurrentPosition() +
-                    (int)(distance * COUNTS_PER_INCH);
-            newBLTarget = roger.frontLeft.getCurrentPosition() +
-                    (int)(distance * COUNTS_PER_INCH);
-            newBRTarget = roger.frontLeft.getCurrentPosition() +
-                    (int)(distance * COUNTS_PER_INCH);
-
-            if (distance > 0) {
-                roger.frontLeft.setTargetPosition(newFLTarget);
-                roger.frontRight.setTargetPosition(newFRTarget);
-                roger.backLeft.setTargetPosition(newBLTarget);
-                roger.backRight.setTargetPosition(newBRTarget);
-            } else {
-                roger.frontLeft.setTargetPosition(newFLTarget);
-                roger.frontRight.setTargetPosition(newFRTarget);
-                roger.backLeft.setTargetPosition(newBLTarget);
-                roger.backRight.setTargetPosition(newBRTarget);
-            }
-
-            // Enable RUN_TO_POSITION
-            allMotorsRunToPosition();
-
-            // Reset timeout time, start to move
-            runtime.reset();
-            allMotorsPower(power);
-
-            while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
-                    (roger.frontLeft.isBusy()) || roger.frontRight.isBusy()
-                    || roger.backLeft.isBusy() || roger.backRight.isBusy()) {
-
-                // Display the current data for the driver
-                telemetry.addData("FL", "Running to %2d, Currently %2d",
-                        newFLTarget, roger.frontLeft.getCurrentPosition());
-                telemetry.addData("FR", "Running to %2d, Currently %2d",
-                        newFRTarget, roger.frontRight.getCurrentPosition());
-                telemetry.addData("BL", "Running to %2d, Currently %2d",
-                        newBLTarget, roger.backLeft.getCurrentPosition());
-                telemetry.addData("BR", "Running to %2d, Currently %2d",
-                        newBRTarget, roger.backRight.getCurrentPosition());
-                telemetry.update();
-            }
-
-            // After the moves are over, set motor power to 0, reset encoders
             allMotorsOff();
             allMotorsRunUsingEncoder();
 

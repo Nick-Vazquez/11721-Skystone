@@ -142,7 +142,7 @@ public class TeleOp_Basic extends LinearOpMode {
             if (gamepad2.right_bumper) {
                 roger.clawServo.setPower(HardwareRoger.CLAW_CLOSE_POWER);
                 telemetry.addData("Claw", "Claw Closing!");
-            } else {
+            } else if (gamepad2.left_bumper) {
                 roger.clawServo.setPower(HardwareRoger.CLAW_STOP);
                 telemetry.addData("Claw", "Claw Stopped!");
             }
@@ -225,6 +225,8 @@ public class TeleOp_Basic extends LinearOpMode {
             // After the moves are over, set motor power to 0
             roger.grabber.setPower(0);
             roger.grabber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            sleep(250);
         }
     }
 }
