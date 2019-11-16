@@ -30,15 +30,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.qualcomm.ftccommon.SoundPlayer;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcontroller.external.samples.HardwarePushbot;
 
 /**
  * This OpMode uses the roger hardware class to define the devices on the roger.
@@ -68,10 +65,14 @@ public class TeleOp_Basic extends LinearOpMode {
     // Flag to determine if sounds are playing
     private boolean soundPlaying    = false;
 
-    private boolean isGrabberDown   = false;
-    private boolean isHolderDown    = false;
+    private boolean isMoverDown;
+    private boolean isGrabberDown = false;
 
     private static final double COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
+    private static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    private static final double     WHEEL_DIAMETER_INCHES   = 0.7 ;     // For figuring circumference
+    private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
     private static final int POSITION_UP             = 0;
     private static final int POSITION_DOWN           = 1;
 
@@ -80,11 +81,13 @@ public class TeleOp_Basic extends LinearOpMode {
         double forward;
         double side;
         double rotation;
+        double foundation;
 
         double frontLeftPower;
         double frontRightPower;
         double backLeftPower;
         double backRightPower;
+        double foundationPower;
 
         int soundID = -1;
         Context myApp = hardwareMap.appContext;
@@ -113,12 +116,15 @@ public class TeleOp_Basic extends LinearOpMode {
             forward         = -gamepad1.left_stick_y;
             side            = gamepad1.left_stick_x;
             rotation        = gamepad1.right_stick_x;
+            foundation      = -gamepad2.right_stick_y;
 
             // TODO: Normalize Values
             backLeftPower = forward - side + rotation;
             backRightPower = forward + side - rotation;
             frontRightPower = forward - side - rotation;
             frontLeftPower = forward + side + rotation;
+
+            foundationPower = foundation;
 
             // Look for trigger to see if we should play sound
             // Only start a new sound if we are currently not playing one.
@@ -158,15 +164,14 @@ public class TeleOp_Basic extends LinearOpMode {
             }
 
             if (gamepad2.y) {
-                if (isHolderDown) {
-                    roger.holderLeft.setPosition(HardwareRoger.LEFT_HOLDER_OPEN_POS);
-                    roger.holderRight.setPosition(HardwareRoger.RIGHT_HOLDER_OPEN_POS);
-                    isHolderDown = false;
+                if (isMoverDown) {
+
+                    isMoverDown = false;
                     sleep(100);
                 } else {
                     roger.holderLeft.setPosition(HardwareRoger.LEFT_HOLDER_CLOSE_POS);
                     roger.holderRight.setPosition(HardwareRoger.RIGHT_HOLDER_CLOSE_POS);
-                    isHolderDown = true;
+                    isMoverDown = true;
                     sleep(100);
                 }
             }
@@ -176,6 +181,7 @@ public class TeleOp_Basic extends LinearOpMode {
             roger.frontRight.setPower(frontRightPower);
             roger.backLeft.setPower(backLeftPower);
             roger.backRight.setPower(backRightPower);
+            roger.foundationMover.setPower(foundationPower);
 
             // Send telemetry message to signify roger running;
             telemetry.addData("frontLeft",  "%.2f", frontLeftPower);
@@ -193,38 +199,79 @@ public class TeleOp_Basic extends LinearOpMode {
         double timeoutS     = 2;
 
         if (position == POSITION_UP){
-            rotations = 0.4;
+            rotations = -0.45;
         } else if (position == POSITION_DOWN) {
-            rotations = -0.4;
+            rotations = 0.45;
         } else {
             telemetry.addData("Position", "No position data found!");
         }
 
         if (opModeIsActive()) {
-            newGrabberTarget = roger.grabber.getCurrentPosition() +
+            newGrabberTarget = roger.slideRotater.getCurrentPosition() +
                     (int)(rotations * COUNTS_PER_MOTOR_REV);
 
-            roger.grabber.setTargetPosition(newGrabberTarget);
+            roger.slideRotater.setTargetPosition(newGrabberTarget);
 
             // Enable RUN_TO_POSITION
-            roger.grabber.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            roger.slideRotater.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Reset timeout time, start to move
             runtime.reset();
 
-            roger.grabber.setPower(0.5);
+            roger.slideRotater.setPower(0.35);
 
             while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
-                    (roger.grabber.isBusy())) {
+                    (roger.slideRotater.isBusy())) {
 
                 // Display the current data for the driver
                 telemetry.addData("Grabber", "Running to %2d, Currently %2d",
-                        newGrabberTarget, roger.grabber.getCurrentPosition());
+                        newGrabberTarget, roger.slideRotater.getCurrentPosition());
             }
 
             // After the moves are over, set motor power to 0
-            roger.grabber.setPower(0);
-            roger.grabber.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            roger.slideRotater.setPower(0);
+            roger.slideRotater.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
+
+//    private void moveMover(int position) {
+//        int newGrabberTarget;
+//        double inches = 0;
+//        double timeoutS     = 2;
+//
+//        if (position == POSITION_UP){
+//            inches = 1;
+//        } else if (position == POSITION_DOWN) {
+//            inches = -0.4;
+//        } else {
+//            telemetry.addData("Position", "No position data found!");
+//        }
+//
+//        if (opModeIsActive()) {
+//            newGrabberTarget = roger.foundationMover.getCurrentPosition() +
+//                    (int)(inches * COUNTS_PER_INCH);
+//
+//            roger.foundationMover.setTargetPosition(newGrabberTarget);
+//
+//            // Enable RUN_TO_POSITION
+//            roger.foundationMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//            // Reset timeout time, start to move
+//            runtime.reset();
+//
+//            roger.foundationMover.setPower(0.5);
+//
+//            while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
+//                    (roger.foundationMover.isBusy())) {
+//
+//                // Display the current data for the driver
+//                telemetry.addData("Grabber", "Running to %2d, Currently %2d",
+//                        newGrabberTarget, roger.foundationMover.getCurrentPosition());
+//            }
+//
+//            // After the moves are over, set motor power to 0
+//            roger.foundationMover.setPower(0);
+//            roger.foundationMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        }
+//    }
 }
