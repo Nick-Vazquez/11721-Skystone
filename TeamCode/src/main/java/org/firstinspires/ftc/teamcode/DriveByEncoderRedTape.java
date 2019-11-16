@@ -123,7 +123,12 @@ public class DriveByEncoderRedTape extends LinearOpMode {
         // FwdRev moves bot forward to avoid obstacles
         // mechFwdRev(DRIVE_SPEED, 24, 3);
 
-        while (opModeIsActive() && hsvValues[0] > 50) {
+        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
+                (int) (sensorColor.green() * SCALE_FACTOR),
+                (int) (sensorColor.blue() * SCALE_FACTOR),
+                hsvValues);
+
+        while (opModeIsActive() && hsvValues[0] > 40) {
             Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
                     (int) (sensorColor.green() * SCALE_FACTOR),
                     (int) (sensorColor.blue() * SCALE_FACTOR),
