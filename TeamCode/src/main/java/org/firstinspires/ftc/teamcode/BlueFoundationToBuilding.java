@@ -29,12 +29,9 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import android.app.Activity;
 import android.graphics.Color;
-import android.view.View;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -67,16 +64,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Drive By Encoder: Blue Building", group="Roger")
-@Disabled
-public class DriveByEncoderBlueBuilding extends LinearOpMode {
+@Autonomous(name="Blue foundation to building - Start right wheels in building", group="Roger")
+public class BlueFoundationToBuilding extends LinearOpMode {
 
     /* Declare OpMode members. */
-    // TODO: You know what to do...
     private HardwareRoger           roger   = new HardwareRoger();   // Use roger's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
-    // TODO: If this breaks, remove the privates
     private static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     private static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
@@ -100,54 +94,35 @@ public class DriveByEncoderBlueBuilding extends LinearOpMode {
         // to amplify/attenuate the measured values.
         final double SCALE_FACTOR = 255;
 
-        // Send telemetry message to signify roger waiting;
-        telemetry.addData("Status", "Resetting Encoders");    //
-        telemetry.update();
-
         ColorSensor sensorColor = roger.sensorColor;
 
-        allMotorsStopResetEncoder();
-
-        allMotorsRunUsingEncoder();
-
-        // Send telemetry message to indicate successful Encoder reset
-        telemetry.addData("Path0",  "Starting at %2d :%2d :%2d :%2d",
-                roger.frontLeft.getCurrentPosition(),
-                roger.frontRight.getCurrentPosition(),
-                roger.backLeft.getCurrentPosition(),
-                roger.backRight.getCurrentPosition());
-
-        telemetry.update();
-
-        // Wait for the game to start (driver presses PLAY)
-        waitForStart();
-
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        mechFwdRev(DRIVE_SPEED,12,  5);  // S1: Forward 12 Inches with 5 Sec timeout
-        mechLeftRight(DRIVE_SPEED,7, 5);  // S3: Right 12 Inches with 5 Sec timeout
-        mechFwdRev(DRIVE_SPEED,55, 6);  // S2: Backward 12 Inches with 5 Sec timeout
-        mechLeftRight(DRIVE_SPEED,24, 11);  // S3: Left 12 Inches with 5 Sec timeout
-        mechFwdRev(DRIVE_SPEED, -50, 6);
-        mechLeftRight(DRIVE_SPEED, -20, 5);
-        mechFwdRev(DRIVE_SPEED, -5, 5);
-
+        // Move to the right a little bit to grab the foundation from the center
+        mechLeftRight(DRIVE_SPEED, 8, 2);
+        // Move backwards to hit the foundation
+        mechFwdRev(DRIVE_SPEED, -30, 5);
+        // Deploy the foundation grabber
+        // TODO: Edit these values
+        moveFoundationGrabber(1, 5, 2);
+        // Move back to starting position
+        mechFwdRev(DRIVE_SPEED, 30, 5);
+        // Retract the foundation grabber
+        // TODO: Edit these values
+        moveFoundationGrabber(1, -5, 2);
+        // Get out of the way of the foundation, try to move to the tape
         while (opModeIsActive() && hsvValues[0] < 190) {
             Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
                     (int) (sensorColor.green() * SCALE_FACTOR),
                     (int) (sensorColor.blue() * SCALE_FACTOR),
                     hsvValues);
 
-            roger.frontRight.setPower(-DRIVE_SPEED);
-            roger.frontLeft.setPower(DRIVE_SPEED);
-            roger.backRight.setPower(DRIVE_SPEED);
-            roger.backLeft.setPower(-DRIVE_SPEED);
+            roger.frontRight.setPower(DRIVE_SPEED);
+            roger.frontLeft.setPower(-DRIVE_SPEED);
+            roger.backRight.setPower(-DRIVE_SPEED);
+            roger.backLeft.setPower(DRIVE_SPEED);
         }
+        // Move to the right a little bit to ensure we are covering the tape
+        mechLeftRight(DRIVE_SPEED, 5, 2);
 
-        allMotorsOff();
-
-        telemetry.addData("Path", "Complete");
-        telemetry.update();
     }
 
     /**
@@ -211,7 +186,6 @@ public class DriveByEncoderBlueBuilding extends LinearOpMode {
      * @param distance Distance to be travelled by Roger (Positive value indicates right travel)
      * @param timeoutS timeout(seconds) for command to be completed
      */
-    // TODO: You know what to do...
     private void mechLeftRight(double power, double distance, double timeoutS) {
         int newFLTarget;
         int newFRTarget;
@@ -260,6 +234,43 @@ public class DriveByEncoderBlueBuilding extends LinearOpMode {
                         newBLTarget, roger.backLeft.getCurrentPosition());
                 telemetry.addData("BR", "Running to %2d, Currently %2d",
                         newBRTarget, roger.backRight.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // After the moves are over, set motor power to 0, reset encoders
+            allMotorsOff();
+            allMotorsRunUsingEncoder();
+
+            // sleep(250); // Optional sleep after each move
+        }
+    }
+
+    /**
+     * Method to drive the foundation mover up or down:
+     * @param power Power (-1 - 1) for motor to drive
+     * @param distance Distance to be moved up or down by the foundation mover
+     * @param timeoutS timeout(seconds) for command to be completed
+     */
+    private void moveFoundationGrabber(double power, double distance, double timeoutS) {
+        int newGrabberTarget;
+
+        if (opModeIsActive()) {
+            newGrabberTarget = roger.foundation.getCurrentPosition() +
+                    (int)(distance * COUNTS_PER_INCH);
+
+            // Enable RUN_TO_POSITION
+            allMotorsRunToPosition();
+
+            // Reset timeout time, start to move
+            runtime.reset();
+            allMotorsPower(power);
+
+            while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
+                    (roger.foundation.isBusy())) {
+
+                // Display the current data for the driver
+                telemetry.addData("Foundation", "Running to %2d, " + "Currently %2d"
+                        , newGrabberTarget, roger.frontLeft.getCurrentPosition());
                 telemetry.update();
             }
 
