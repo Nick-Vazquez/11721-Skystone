@@ -64,15 +64,13 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Remove or comment out the @Disabled line to add this opmode to the Driver Station OpMode list
  */
 
-@Autonomous(name="Go to Tape: Blue Forward", group="Roger")
-public class DriveByEncoderBlueTapeFwd extends LinearOpMode {
+@Autonomous(name="Go to Tape: Red Building Fwd", group="Roger")
+public class TapeRedBuildingFwd extends LinearOpMode {
 
     /* Declare OpMode members. */
-    // TODO: You know what to do...
     private HardwareRoger           roger   = new HardwareRoger();   // Use roger's hardware
     private ElapsedTime     runtime = new ElapsedTime();
 
-    // TODO: If this breaks, remove the privates
     private static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     private static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
@@ -118,24 +116,30 @@ public class DriveByEncoderBlueTapeFwd extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         waitForStart();
 
-        // Step through each leg of the path,
-        // Note: Reverse movement is obtained by setting a negative distance (not speed)
-        // FwdRev moves bot forward to avoid obstacles
-         mechFwdRev(DRIVE_SPEED, 24, 3);
+        mechFwdRev(DRIVE_SPEED, 24, 5);
 
-        while (opModeIsActive() && hsvValues[0] < 190) {
+        Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
+                (int) (sensorColor.green() * SCALE_FACTOR),
+                (int) (sensorColor.blue() * SCALE_FACTOR),
+                hsvValues);
+
+        // It reads the color hue up until it sees blue hue greater than 190 then moves in a couple
+        // inches
+        while (opModeIsActive() && hsvValues[0] > 40) {
             Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
                     (int) (sensorColor.green() * SCALE_FACTOR),
                     (int) (sensorColor.blue() * SCALE_FACTOR),
                     hsvValues);
 
-            roger.frontRight.setPower(-DRIVE_SPEED);
-            roger.frontLeft.setPower(DRIVE_SPEED);
-            roger.backRight.setPower(DRIVE_SPEED);
-            roger.backLeft.setPower(-DRIVE_SPEED);
+            roger.frontRight.setPower(DRIVE_SPEED);
+            roger.frontLeft.setPower(-DRIVE_SPEED);
+            roger.backRight.setPower(-DRIVE_SPEED);
+            roger.backLeft.setPower(DRIVE_SPEED);
         }
 
         allMotorsOff();
+
+        mechLeftRight(DRIVE_SPEED, 5, 2);
 
         telemetry.addData("Path", "Complete");
         telemetry.update();
@@ -202,7 +206,6 @@ public class DriveByEncoderBlueTapeFwd extends LinearOpMode {
      * @param distance Distance to be travelled by Roger (Positive value indicates right travel)
      * @param timeoutS timeout(seconds) for command to be completed
      */
-    // TODO: You know what to do...
     private void mechLeftRight(double power, double distance, double timeoutS) {
         int newFLTarget;
         int newFRTarget;
