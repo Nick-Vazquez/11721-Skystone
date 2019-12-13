@@ -32,9 +32,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 
 /**
  * This is NOT an opmode.
@@ -57,22 +55,17 @@ class HardwareRoger
     DcMotor frontRight  = null;
     DcMotor backLeft    = null;
     DcMotor backRight   = null;
-    DcMotor foundationMover     = null;
-    DcMotor slideRotater        = null;
+    DcMotor foundation  = null;
+    DcMotor slideRotater = null;
+    DcMotor slideExtender = null;
 
     CRServo clawServo   = null;
-
-    Servo holderLeft    = null;
-    Servo holderRight   = null;
 
     ColorSensor sensorColor = null;
 
     static final double CLAW_OPEN_POWER      =  1;
     static final double CLAW_CLOSE_POWER     = -1;
     static final double CLAW_STOP            = 0;
-
-    static final double LEFT_HOLDER_CLOSE_POS   = 0.1;
-    static final double RIGHT_HOLDER_CLOSE_POS  = 0.9;
 
     /* local OpMode members. */
     private HardwareMap hwMap           =  null;
@@ -91,8 +84,9 @@ class HardwareRoger
         frontRight  = hwMap.get(DcMotor.class,"frontRight");
         backLeft    = hwMap.get(DcMotor.class, "backLeft");
         backRight   = hwMap.get(DcMotor.class, "backRight");
-        foundationMover     = hwMap.get(DcMotor.class, "foundation_mover");
-        slideRotater        = hwMap.get(DcMotor.class, "slideRotater");
+        foundation  = hwMap.get(DcMotor.class, "foundation");
+        slideRotater = hwMap.get(DcMotor.class,"slideRotater");
+        slideExtender = hwMap.get(DcMotor.class, "slideExtender");
 
         /*
          * Set the direction of the motors so that a full forward command
@@ -102,14 +96,18 @@ class HardwareRoger
         frontRight.setDirection(DcMotor.Direction.FORWARD);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         backRight.setDirection(DcMotor.Direction.FORWARD);
-        foundationMover.setDirection(DcMotor.Direction.REVERSE);
+        foundation.setDirection(DcMotor.Direction.REVERSE);
+        slideRotater.setDirection(DcMotor.Direction.FORWARD);
+        slideExtender.setDirection(DcMotor.Direction.FORWARD);
 
         // Set all motors to zero power
         frontLeft.setPower(0);
         frontRight.setPower(0);
         backLeft.setPower(0);
         backRight.setPower(0);
-        foundationMover.setPower(0);
+        foundation.setPower(0);
+        slideRotater.setPower(0);
+        slideExtender.setPower(0);
 
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
@@ -117,15 +115,12 @@ class HardwareRoger
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        foundationMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        foundation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideRotater.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        slideExtender.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         clawServo   = hwMap.get(CRServo.class, "claw");
         clawServo.setPower(CLAW_STOP);
-
-        holderLeft  = hwMap.get(Servo.class, "holderLeft");
-        holderLeft.setPosition(LEFT_HOLDER_CLOSE_POS);
-        holderRight = hwMap.get(Servo.class, "holderRight");
-        holderRight.setPosition(RIGHT_HOLDER_CLOSE_POS);
 
         sensorColor = hwMap.get(ColorSensor.class, "color");
     }

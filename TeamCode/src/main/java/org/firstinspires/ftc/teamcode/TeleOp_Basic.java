@@ -60,19 +60,11 @@ public class TeleOp_Basic extends LinearOpMode {
     private HardwareRoger roger = new HardwareRoger();      // Use Roger's Hardware
     private ElapsedTime runtime = new ElapsedTime();
 
-    private String[] sounds = {"ss_alarm", "ss_light_saber"};
-
     // Flag to determine if sounds are playing
     private boolean soundPlaying    = false;
-
-    private boolean isMoverDown;
-    private boolean isGrabberDown = false;
+    private boolean isSlideVertical = false;
 
     private static final double COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
-    private static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    private static final double     WHEEL_DIAMETER_INCHES   = 0.7 ;     // For figuring circumference
-    private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
-            (WHEEL_DIAMETER_INCHES * 3.1415);
     private static final int POSITION_UP             = 0;
     private static final int POSITION_DOWN           = 1;
 
@@ -81,15 +73,13 @@ public class TeleOp_Basic extends LinearOpMode {
         double forward;
         double side;
         double rotation;
-        double foundation;
 
         double frontLeftPower;
         double frontRightPower;
         double backLeftPower;
         double backRightPower;
-        double foundationPower;
 
-        int soundID = -1;
+        int soundID;
         Context myApp = hardwareMap.appContext;
 
         SoundPlayer.PlaySoundParams params = new SoundPlayer.PlaySoundParams();
@@ -116,15 +106,12 @@ public class TeleOp_Basic extends LinearOpMode {
             forward         = -gamepad1.left_stick_y;
             side            = gamepad1.left_stick_x;
             rotation        = gamepad1.right_stick_x;
-            foundation      = -gamepad2.right_stick_y;
 
             // TODO: Normalize Values
             backLeftPower = forward - side + rotation;
             backRightPower = forward + side - rotation;
             frontRightPower = forward - side - rotation;
             frontLeftPower = forward + side + rotation;
-
-            foundationPower = foundation;
 
             // Look for trigger to see if we should play sound
             // Only start a new sound if we are currently not playing one.
@@ -154,25 +141,12 @@ public class TeleOp_Basic extends LinearOpMode {
             }
 
             if (gamepad2.x) {
-                if (isGrabberDown) {
-                    moveGrabber(POSITION_UP);
-                    isGrabberDown = false;
+                if (isSlideVertical) {
+                    moveSlides(POSITION_UP);
+                    isSlideVertical = false;
                 } else {
-                    moveGrabber(POSITION_DOWN);
-                    isGrabberDown = true;
-                }
-            }
-
-            if (gamepad2.y) {
-                if (isMoverDown) {
-
-                    isMoverDown = false;
-                    sleep(100);
-                } else {
-                    roger.holderLeft.setPosition(HardwareRoger.LEFT_HOLDER_CLOSE_POS);
-                    roger.holderRight.setPosition(HardwareRoger.RIGHT_HOLDER_CLOSE_POS);
-                    isMoverDown = true;
-                    sleep(100);
+                    moveSlides(POSITION_DOWN);
+                    isSlideVertical = true;
                 }
             }
 
@@ -181,36 +155,36 @@ public class TeleOp_Basic extends LinearOpMode {
             roger.frontRight.setPower(frontRightPower);
             roger.backLeft.setPower(backLeftPower);
             roger.backRight.setPower(backRightPower);
-            roger.foundationMover.setPower(foundationPower);
+            roger.foundation.setPower(0.5 * gamepad2.right_stick_y);
+            roger.slideExtender.setPower(gamepad2.left_stick_y);
 
             // Send telemetry message to signify roger running;
             telemetry.addData("frontLeft",  "%.2f", frontLeftPower);
             telemetry.addData("frontRight", "%.2f", frontRightPower);
             telemetry.addData("backLeft", "%.2f", backLeftPower);
             telemetry.addData("backRight", "%.2f", backRightPower);
-            telemetry.addData("Grabber", isGrabberDown); 
             telemetry.update();
         }
     }
 
-    private void moveGrabber(int position) {
-        int newGrabberTarget;
+    private void moveSlides(int position) {
+        int newSlideTarget;
         double rotations    = 0;
         double timeoutS     = 2;
 
         if (position == POSITION_UP){
-            rotations = -0.45;
+            rotations = 0.4;
         } else if (position == POSITION_DOWN) {
-            rotations = 0.45;
+            rotations = -0.4;
         } else {
             telemetry.addData("Position", "No position data found!");
         }
 
         if (opModeIsActive()) {
-            newGrabberTarget = roger.slideRotater.getCurrentPosition() +
+            newSlideTarget = roger.slideRotater.getCurrentPosition() +
                     (int)(rotations * COUNTS_PER_MOTOR_REV);
 
-            roger.slideRotater.setTargetPosition(newGrabberTarget);
+            roger.slideRotater.setTargetPosition(newSlideTarget);
 
             // Enable RUN_TO_POSITION
             roger.slideRotater.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -218,14 +192,14 @@ public class TeleOp_Basic extends LinearOpMode {
             // Reset timeout time, start to move
             runtime.reset();
 
-            roger.slideRotater.setPower(0.35);
+            roger.slideRotater.setPower(0.5);
 
             while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
                     (roger.slideRotater.isBusy())) {
 
                 // Display the current data for the driver
-                telemetry.addData("Grabber", "Running to %2d, Currently %2d",
-                        newGrabberTarget, roger.slideRotater.getCurrentPosition());
+                telemetry.addData("slideRotater", "Running to %2d, Currently %2d",
+                        newSlideTarget, roger.slideRotater.getCurrentPosition());
             }
 
             // After the moves are over, set motor power to 0
@@ -233,45 +207,4 @@ public class TeleOp_Basic extends LinearOpMode {
             roger.slideRotater.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
     }
-
-//    private void moveMover(int position) {
-//        int newGrabberTarget;
-//        double inches = 0;
-//        double timeoutS     = 2;
-//
-//        if (position == POSITION_UP){
-//            inches = 1;
-//        } else if (position == POSITION_DOWN) {
-//            inches = -0.4;
-//        } else {
-//            telemetry.addData("Position", "No position data found!");
-//        }
-//
-//        if (opModeIsActive()) {
-//            newGrabberTarget = roger.foundationMover.getCurrentPosition() +
-//                    (int)(inches * COUNTS_PER_INCH);
-//
-//            roger.foundationMover.setTargetPosition(newGrabberTarget);
-//
-//            // Enable RUN_TO_POSITION
-//            roger.foundationMover.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//
-//            // Reset timeout time, start to move
-//            runtime.reset();
-//
-//            roger.foundationMover.setPower(0.5);
-//
-//            while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
-//                    (roger.foundationMover.isBusy())) {
-//
-//                // Display the current data for the driver
-//                telemetry.addData("Grabber", "Running to %2d, Currently %2d",
-//                        newGrabberTarget, roger.foundationMover.getCurrentPosition());
-//            }
-//
-//            // After the moves are over, set motor power to 0
-//            roger.foundationMover.setPower(0);
-//            roger.foundationMover.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        }
-//    }
 }
