@@ -120,7 +120,7 @@ class HardwareRoger
         slideExtender.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         clawServo   = hwMap.get(CRServo.class, "claw");
-        clawServo.setPower(CLAW_STOP);
+        clawServo.setPower(CLAW_CLOSE_POWER);
 
         sensorColor = hwMap.get(ColorSensor.class, "color");
     }

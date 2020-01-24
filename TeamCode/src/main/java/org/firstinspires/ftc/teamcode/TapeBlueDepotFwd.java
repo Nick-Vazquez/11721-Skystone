@@ -208,26 +208,20 @@ public class TapeBlueDepotFwd extends LinearOpMode {
         int newBRTarget;
 
         if (opModeIsActive()) {
+
             newFLTarget = roger.frontLeft.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
-            newFRTarget = roger.frontLeft.getCurrentPosition() +
+            newFRTarget = roger.frontRight.getCurrentPosition() -
                     (int)(distance * COUNTS_PER_INCH);
-            newBLTarget = roger.frontLeft.getCurrentPosition() +
+            newBLTarget = roger.backLeft.getCurrentPosition() -
                     (int)(distance * COUNTS_PER_INCH);
-            newBRTarget = roger.frontLeft.getCurrentPosition() +
+            newBRTarget = roger.backRight.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
 
-            if (distance > 0) {
-                roger.frontLeft.setTargetPosition(newFLTarget);
-                roger.frontRight.setTargetPosition(-newFRTarget);
-                roger.backLeft.setTargetPosition(-newBLTarget);
-                roger.backRight.setTargetPosition(newBRTarget);
-            } else {
-                roger.frontLeft.setTargetPosition(-newFLTarget);
-                roger.frontRight.setTargetPosition(newFRTarget);
-                roger.backLeft.setTargetPosition(newBLTarget);
-                roger.backRight.setTargetPosition(-newBRTarget);
-            }
+            roger.frontLeft.setTargetPosition(newFLTarget);
+            roger.frontRight.setTargetPosition(newFRTarget);
+            roger.backLeft.setTargetPosition(newBLTarget);
+            roger.backRight.setTargetPosition(newBRTarget);
 
             // Enable RUN_TO_POSITION
             allMotorsRunToPosition();

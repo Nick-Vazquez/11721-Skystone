@@ -142,10 +142,10 @@ public class TeleOp_Basic extends LinearOpMode {
 
             if (gamepad2.x) {
                 if (isSlideVertical) {
-                    moveSlides(POSITION_UP);
+                    moveSlides(POSITION_DOWN);
                     isSlideVertical = false;
                 } else {
-                    moveSlides(POSITION_DOWN);
+                    moveSlides(POSITION_UP);
                     isSlideVertical = true;
                 }
             }
@@ -155,8 +155,8 @@ public class TeleOp_Basic extends LinearOpMode {
             roger.frontRight.setPower(frontRightPower);
             roger.backLeft.setPower(backLeftPower);
             roger.backRight.setPower(backRightPower);
-            roger.foundation.setPower(0.5 * gamepad2.right_stick_y);
-            roger.slideExtender.setPower(gamepad2.left_stick_y);
+            roger.foundation.setPower(-0.5 * gamepad2.right_stick_y);
+            roger.slideExtender.setPower(0.5 * gamepad2.left_stick_y);
 
             // Send telemetry message to signify roger running;
             telemetry.addData("frontLeft",  "%.2f", frontLeftPower);
@@ -173,9 +173,9 @@ public class TeleOp_Basic extends LinearOpMode {
         double timeoutS     = 2;
 
         if (position == POSITION_UP){
-            rotations = 0.4;
+            rotations = 0.25;
         } else if (position == POSITION_DOWN) {
-            rotations = -0.4;
+            rotations = -0.25;
         } else {
             telemetry.addData("Position", "No position data found!");
         }
@@ -192,7 +192,7 @@ public class TeleOp_Basic extends LinearOpMode {
             // Reset timeout time, start to move
             runtime.reset();
 
-            roger.slideRotater.setPower(0.5);
+            roger.slideRotater.setPower(0.25);
 
             while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
                     (roger.slideRotater.isBusy())) {

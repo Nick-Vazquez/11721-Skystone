@@ -73,7 +73,7 @@ public class BlueFoundationToBuilding extends LinearOpMode {
 
     private static final double     COUNTS_PER_MOTOR_REV    = 1440 ;    // eg: TETRIX Motor Encoder
     private static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
-    private static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    private static final double     WHEEL_DIAMETER_INCHES   = 0.7 ;     // For figuring circumference
     private static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
                                                       (WHEEL_DIAMETER_INCHES * 3.1415);
     private static final double     DRIVE_SPEED             = 0.8;
@@ -96,18 +96,22 @@ public class BlueFoundationToBuilding extends LinearOpMode {
 
         ColorSensor sensorColor = roger.sensorColor;
 
+        // Wait for the game to start (driver presses PLAY)
+        waitForStart();
+
+        mechFwdRev(DRIVE_SPEED, -2, 2);
         // Move to the right a little bit to grab the foundation from the center
         mechLeftRight(DRIVE_SPEED, 8, 2);
         // Move backwards to hit the foundation
-        mechFwdRev(DRIVE_SPEED, -30, 5);
+        mechFwdRev(DRIVE_SPEED, -28, 5);
         // Deploy the foundation grabber
         // TODO: Edit these values
-        moveFoundationGrabber(1, 5, 2);
+        moveFoundationGrabber(1, 1, 0.1);
         // Move back to starting position
         mechFwdRev(DRIVE_SPEED, 30, 5);
         // Retract the foundation grabber
         // TODO: Edit these values
-        moveFoundationGrabber(1, -5, 2);
+        moveFoundationGrabber(1, -1, 0.1);
         // Get out of the way of the foundation, try to move to the tape
         while (opModeIsActive() && hsvValues[0] < 190) {
             Color.RGBToHSV((int) (sensorColor.red() * SCALE_FACTOR),
@@ -193,26 +197,20 @@ public class BlueFoundationToBuilding extends LinearOpMode {
         int newBRTarget;
 
         if (opModeIsActive()) {
+
             newFLTarget = roger.frontLeft.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
-            newFRTarget = roger.frontLeft.getCurrentPosition() +
+            newFRTarget = roger.frontRight.getCurrentPosition() -
                     (int)(distance * COUNTS_PER_INCH);
-            newBLTarget = roger.frontLeft.getCurrentPosition() +
+            newBLTarget = roger.backLeft.getCurrentPosition() -
                     (int)(distance * COUNTS_PER_INCH);
-            newBRTarget = roger.frontLeft.getCurrentPosition() +
+            newBRTarget = roger.backRight.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
 
-            if (distance > 0) {
-                roger.frontLeft.setTargetPosition(newFLTarget);
-                roger.frontRight.setTargetPosition(-newFRTarget);
-                roger.backLeft.setTargetPosition(-newBLTarget);
-                roger.backRight.setTargetPosition(newBRTarget);
-            } else {
-                roger.frontLeft.setTargetPosition(-newFLTarget);
-                roger.frontRight.setTargetPosition(newFRTarget);
-                roger.backLeft.setTargetPosition(newBLTarget);
-                roger.backRight.setTargetPosition(-newBRTarget);
-            }
+            roger.frontLeft.setTargetPosition(newFLTarget);
+            roger.frontRight.setTargetPosition(newFRTarget);
+            roger.backLeft.setTargetPosition(newBLTarget);
+            roger.backRight.setTargetPosition(newBRTarget);
 
             // Enable RUN_TO_POSITION
             allMotorsRunToPosition();
@@ -258,12 +256,14 @@ public class BlueFoundationToBuilding extends LinearOpMode {
             newGrabberTarget = roger.foundation.getCurrentPosition() +
                     (int)(distance * COUNTS_PER_INCH);
 
+            roger.foundation.setTargetPosition(newGrabberTarget);
+
             // Enable RUN_TO_POSITION
-            allMotorsRunToPosition();
+            roger.foundation.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
             // Reset timeout time, start to move
             runtime.reset();
-            allMotorsPower(power);
+            roger.foundation.setPower(power);
 
             while (opModeIsActive() && (runtime.seconds() < timeoutS) &&
                     (roger.foundation.isBusy())) {
@@ -275,8 +275,8 @@ public class BlueFoundationToBuilding extends LinearOpMode {
             }
 
             // After the moves are over, set motor power to 0, reset encoders
-            allMotorsOff();
-            allMotorsRunUsingEncoder();
+            roger.foundation.setPower(0);
+            roger.foundation.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             // sleep(250); // Optional sleep after each move
         }
